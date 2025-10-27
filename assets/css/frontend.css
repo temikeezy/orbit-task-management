@@ -1,0 +1,150 @@
+/* OTM front-end */ .otm-form .widefat{width:100%;} .otm-table{width:100%;border-collapse:collapse} .otm-table th,.otm-table td{border:1px solid #eee;padding:6px;}
+
+/* Ensure checkboxes are visible in themes that hide native inputs */
+.otm-form input[type="checkbox"]{
+  position: static !important;
+  opacity: 1 !important;
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  width: auto !important;
+  height: auto !important;
+  display: inline-block !important;
+  margin-right: 6px;
+}
+.otm-form label { margin-right: 12px; }
+
+
+.otm-task { padding: 12px 0; border-bottom: 1px solid #eee; }
+.otm-task h4 { margin: 0 0 6px; }
+.otm-task-list { margin-bottom: 18px; }
+
+
+.otm-task-meta { background:#fafafa; border:1px solid #eee; padding:8px; margin:8px 0; }
+.otm-existing { background:#f6fff6; border:1px solid #dfeedd; padding:8px; margin:8px 0; }
+
+
+/* OTM cards */
+.otm-card{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin:14px 0;background:#fff;}
+.otm-card h4{margin:0 0 6px;font-size:18px;line-height:1.2;}
+.otm-meta{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px;}
+.otm-badge{display:inline-block;margin-right:8px;padding:3px 10px;border:1px solid #e5e7eb;border-radius:999px;background:#f9fafb;font-size:12px;color:#374151}
+.bb-card .otm-badge{margin-right:6px}
+.bb-meta .otm-badge{margin-right:6px}
+.bp-wrap .item-list.bb-forums-list.bb-lists{list-style:none;margin:0;padding:0}
+.bp-wrap .item-list.bb-forums-list.bb-lists .bb-card{padding:16px;margin:12px 0;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
+.bp-wrap .item-list.bb-forums-list.bb-lists .bb-card .entry-title{margin:0 0 6px;font-size:18px}
+.bp-wrap .bp-feedback.info{border-left:4px solid #10b981;background:#ecfdf5;padding:12px;border-radius:6px}
+.bb-head-actions{display:flex;align-items:center;justify-content:space-between;margin:10px 0 14px}
+.button.bb-primary-button{background:#22c55e;border-color:#22c55e;color:#fff}
+.button.bb-primary-button:hover{filter:brightness(0.95)}
+.otm-card .entry{color:#374151;margin-bottom:10px;}
+.otm-actions{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px;}
+.otm-btn{display:inline-block;padding:6px 12px;border-radius:8px;border:1px solid #d1d5db;background:#f9fafb;text-decoration:none;cursor:pointer}
+.otm-btn:hover{background:#f3f4f6}
+.otm-btn.primary{background:#2563eb;border-color:#1d4ed8;color:#fff}
+.otm-btn.primary:hover{background:#1d4ed8}
+.otm-collapsible{display:none;margin-top:10px}
+/* meta/status blocks */
+.otm-task-meta{background:#fafafa;border:1px solid #eee;padding:8px;border-radius:8px;margin:8px 0}
+.otm-existing{background:#f6fff6;border:1px solid #dfeedd;padding:8px;border-radius:8px;margin:8px 0}
+/* spacing between list and create panel */
+.otm-task-list{margin-bottom:24px}
+
+/* ------------------------------------------------------------ */
+/* BuddyBoss-like base styles (self-contained, no external deps) */
+/* ------------------------------------------------------------ */
+
+/* Containers */
+.bp-wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+.bb-content{background:transparent}
+
+/* Head actions */
+.bb-head-actions{display:flex;align-items:center;justify-content:space-between;margin:10px 0 14px}
+.bb-group-head .screen-heading{margin:0;font-size:22px;line-height:1.3;font-weight:600;color:#111827}
+
+/* Buttons */
+.button{display:inline-block;appearance:none;border:1px solid #d1d5db;background:#fff;color:#111827;border-radius:8px;padding:8px 14px;font-size:14px;line-height:1.2;text-decoration:none;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s}
+.button:hover{background:#f9fafb}
+.button:focus{outline:2px solid #93c5fd;outline-offset:2px}
+.button.button-primary,.button.primary{background:#2563eb;border-color:#1d4ed8;color:#fff}
+.button.button-primary:hover,.button.primary:hover{background:#1d4ed8}
+.button.bb-primary-button{background:#22c55e;border-color:#16a34a;color:#fff}
+.button.bb-primary-button:hover{filter:brightness(0.95)}
+
+/* Lists (Discussions-like) */
+.item-list.bb-forums-list.bb-lists{list-style:none;margin:0;padding:0}
+.bb-card{border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:16px;margin:12px 0}
+.bb-card.bb-card--list .entry-title{margin:0 0 8px;font-size:18px;line-height:1.25;font-weight:600}
+.bb-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 10px;color:#6b7280;font-size:13px}
+.action{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Badges & pills */
+.otm-badge{display:inline-block;margin-right:8px;padding:3px 10px;border:1px solid #e5e7eb;border-radius:999px;background:#f9fafb;font-size:12px;color:#374151}
+.bb-card .otm-badge{margin-right:6px}
+.bb-meta .otm-badge{margin-right:6px}
+
+/* Feedback (empty states) */
+.bp-feedback{border-radius:8px;padding:12px 14px;border:1px solid #dcfce7;background:#ecfdf5;color:#065f46}
+.bp-feedback.info{border-left:4px solid #10b981}
+.bp-feedback .bp-icon{display:inline-block;width:14px;height:14px;background:#10b981;border-radius:50%;margin-right:8px;vertical-align:middle}
+
+/* Subnavs (filters) */
+.bp-navs.bp-subnavs{margin:10px 0}
+.bp-navs.bp-subnavs .subnav{display:flex;gap:10px;list-style:none;margin:0;padding:0;border-bottom:1px solid #e5e7eb}
+.bp-navs.bp-subnavs .subnav li{margin:0}
+.bp-navs.bp-subnavs .subnav a{display:block;padding:8px 10px 10px;color:#374151;text-decoration:none;border-bottom:2px solid transparent}
+.bp-navs.bp-subnavs .subnav li.current a{color:#111827;border-bottom-color:#2563eb;font-weight:600}
+
+/* Pagination */
+.pagination{display:flex;gap:8px;margin:12px 0}
+.pagination a{display:inline-block;padding:6px 10px;border:1px solid #e5e7eb;border-radius:8px;text-decoration:none;color:#374151}
+.pagination a.current{background:#2563eb;border-color:#1d4ed8;color:#fff}
+
+/* Forms */
+.standard-form label{display:block;margin:8px 0 6px;font-weight:600;color:#374151}
+.standard-form input[type="text"],
+.standard-form input[type="number"],
+.standard-form input[type="url"],
+.standard-form input[type="datetime-local"],
+.standard-form select,
+.standard-form textarea{width:100%;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;font-size:14px;background:#fff;color:#111827}
+.standard-form input[type="checkbox"]{position:static!important;opacity:1!important;appearance:auto!important;-webkit-appearance:checkbox!important;width:auto!important;height:auto!important;display:inline-block!important;margin-right:6px}
+.standard-form fieldset{border:1px dashed #e5e7eb;border-radius:8px;padding:10px;margin:10px 0}
+.standard-form legend{padding:0 6px;color:#6b7280}
+.standard-form .description{color:#6b7280;margin:6px 0 0}
+
+/* Thread list (single task) */
+.otm-thread{margin-top:18px}
+.otm-thread-list{list-style:none;margin:0;padding:0}
+.otm-thread-item{display:flex;gap:12px;border-bottom:1px solid #f3f4f6;padding:12px 0}
+.otm-thread-avatar img{border-radius:999px}
+.otm-thread-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:#6b7280;font-size:13px;margin-bottom:6px}
+.otm-thread-content{color:#111827}
+.otm-thread .otm-badge.status{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+.otm-thread .otm-badge.points{background:#ecfeff;border-color:#a5f3fc;color:#0e7490}
+
+/* Full-width leaderboard */
+.otm-board{width:100%;overflow-x:auto;margin-top:14px}
+.otm-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
+.otm-table thead th{font-weight:600;background:#fafafa}
+.otm-table th,.otm-table td{padding:12px 14px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+.otm-table tr:last-child td{border-bottom:0}
+.otm-leaderboard .screen-heading{margin-bottom:4px}
+.otm-leaderboard .otm-lead{margin:4px 0 12px;color:#6b7280}
+.col-pos{width:68px;text-align:center}
+.col-user{width:auto}
+.col-week{width:160px;text-align:right}
+.col-total{width:160px;text-align:right}
+.otm-muted{color:#6b7280}
+.otm-empty-row td{color:#9ca3af}
+
+/* Dashboard stats */
+.otm-dashboard-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0}
+.otm-stat-card{border:1px solid #e5e7eb;border-radius:12px;padding:20px;background:#fff;text-align:center}
+.otm-stat-card h3{margin:0 0 8px;font-size:16px;color:#6b7280}
+.otm-stat-number{font-size:32px;font-weight:700;color:#111827;margin:8px 0}
+.otm-stat-breakdown{margin-top:8px}
+.otm-stat-breakdown .otm-badge{margin:2px 4px}
+.otm-dashboard-actions{margin-top:24px;padding-top:20px;border-top:1px solid #e5e7eb}
+.otm-dashboard-actions h2{margin-bottom:12px}
+.otm-dashboard-actions p{margin:8px 0}
