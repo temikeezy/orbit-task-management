@@ -11,7 +11,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'OTM_VERSION', '0.1.6' );
+define( 'OTM_VERSION', '0.1.7' );
 define( 'OTM_FILE', __FILE__ );
 define( 'OTM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OTM_URL', plugin_dir_url( __FILE__ ) );

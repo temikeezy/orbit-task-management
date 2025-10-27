@@ -426,6 +426,256 @@
     margin-top: 20px;
 }
 
+/* Submissions Screen Styles */
+.otm-submissions-wrap {
+    max-width: 100%;
+}
+
+.otm-submissions-filters {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+}
+
+.otm-filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.otm-search-box {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.otm-search-input {
+    flex: 1;
+    max-width: 400px;
+    padding: 8px 12px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.otm-search-input:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: none;
+}
+
+.otm-filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.otm-task-filter,
+.otm-status-filter,
+.otm-per-page {
+    padding: 6px 8px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 150px;
+}
+
+.otm-results-summary {
+    margin: 15px 0;
+    font-size: 14px;
+    color: #646970;
+    font-style: italic;
+}
+
+/* Enhanced Table Styles */
+.wp-list-table.submissions {
+    margin-top: 20px;
+}
+
+.wp-list-table.submissions th {
+    font-weight: 600;
+    background: #f6f7f7;
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.wp-list-table.submissions th a {
+    text-decoration: none;
+    color: #1d2327;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.wp-list-table.submissions th a:hover {
+    color: #2271b1;
+}
+
+.wp-list-table.submissions th.sorted a {
+    color: #2271b1;
+}
+
+.wp-list-table.submissions th.sortable a:hover {
+    color: #2271b1;
+}
+
+.wp-list-table.submissions td {
+    vertical-align: middle;
+    padding: 12px 8px;
+}
+
+.wp-list-table.submissions td small {
+    color: #646970;
+    font-size: 12px;
+}
+
+/* Status Badges */
+.otm-status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.otm-status-submitted {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.otm-status-approved {
+    background: #d1edff;
+    color: #0c5460;
+    border: 1px solid #b8daff;
+}
+
+.otm-status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.otm-status-changes_requested {
+    background: #e2e3e5;
+    color: #383d41;
+    border: 1px solid #d6d8db;
+}
+
+/* Action Controls */
+.otm-action-form {
+    margin: 0;
+}
+
+.otm-action-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.otm-points-input {
+    width: 70px;
+    padding: 4px 6px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.otm-status-select {
+    padding: 4px 6px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    font-size: 13px;
+    min-width: 120px;
+}
+
+.otm-action-controls .button-small {
+    padding: 4px 8px;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* Pagination */
+.tablenav {
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tablenav-pages {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tablenav-pages .pagination-links {
+    display: flex;
+    gap: 5px;
+}
+
+.tablenav-pages a,
+.tablenav-pages .current {
+    padding: 6px 10px;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    text-decoration: none;
+    color: #2271b1;
+    font-size: 13px;
+}
+
+.tablenav-pages .current {
+    background: #2271b1;
+    color: #fff;
+    border-color: #2271b1;
+}
+
+.tablenav-pages a:hover {
+    background: #f6f7f7;
+    border-color: #8c8f94;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .otm-filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .otm-task-filter,
+    .otm-status-filter,
+    .otm-per-page {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .otm-action-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .otm-points-input,
+    .otm-status-select {
+        width: 100%;
+    }
+    
+    .wp-list-table.submissions {
+        font-size: 13px;
+    }
+    
+    .wp-list-table.submissions th,
+    .wp-list-table.submissions td {
+        padding: 8px 4px;
+    }
+}
+
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
     .otm-dashboard-title,
@@ -454,5 +704,35 @@
     
     .otm-activity-item:hover {
         background: #404040;
+    }
+    
+    .otm-submissions-filters {
+        background: #2c2c2c;
+        border-color: #404040;
+    }
+    
+    .otm-search-input,
+    .otm-task-filter,
+    .otm-status-filter,
+    .otm-per-page,
+    .otm-points-input,
+    .otm-status-select {
+        background: #3c3c3c;
+        border-color: #505050;
+        color: #fff;
+    }
+    
+    .wp-list-table.submissions th {
+        background: #3c3c3c;
+        border-color: #505050;
+        color: #fff;
+    }
+    
+    .wp-list-table.submissions th a {
+        color: #fff;
+    }
+    
+    .wp-list-table.submissions th a:hover {
+        color: #4a9eff;
     }
 }

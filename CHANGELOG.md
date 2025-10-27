@@ -1,5 +1,16 @@
 ## Changelog
 
+### 0.1.7
+- **Enhanced Submissions Screen**: Complete overhaul with modern WordPress admin best practices
+- **Advanced Filtering**: Filter by task name (dropdown) instead of ID, status filter with counts
+- **Search Functionality**: Full-text search across task titles, user names, emails, and usernames
+- **Flexible Pagination**: Configurable items per page (10, 20, 50, 100) with proper pagination
+- **Sortable Columns**: Click-to-sort on all columns (ID, Task, User, Status, Points, Submitted)
+- **Enhanced User Display**: User column shows name, email, and links to user profiles
+- **Status Badges**: Color-coded status indicators with proper styling
+- **Responsive Design**: Mobile-friendly layout with adaptive controls
+- **Modern UI**: WordPress-standard styling with improved accessibility
+
 ### 0.1.6
 - **Dashboard Redesign**: Complete overhaul with modern card-based design
 - **Visual Statistics**: Added animated stat cards with icons and color-coded themes  
