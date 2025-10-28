@@ -17,6 +17,7 @@ require_once OTM_DIR . 'includes/leaderboard/class-otm-widget-overall.php';
 
 require_once OTM_DIR . 'includes/points/class-otm-points-service.php';
 require_once OTM_DIR . 'includes/points/class-otm-points-native.php';
+require_once OTM_DIR . 'includes/points/class-otm-gamipress-automation.php';
 
 require_once OTM_DIR . 'includes/frontend/class-otm-frontend.php';
 require_once OTM_DIR . 'includes/groups/class-otm-group-extension.php';

@@ -46,6 +46,9 @@ add_action('plugins_loaded', function() {
     if ( class_exists('OTM_BuddyBoss_Integration') ) {
         OTM_BuddyBoss_Integration::init();
     }
+    if ( class_exists('OTM_Gamipress_Automation') ) {
+        OTM_Gamipress_Automation::init();
+    }
 }, 1);
 
 /** Points service singleton (native or GamiPress-decorated) */
