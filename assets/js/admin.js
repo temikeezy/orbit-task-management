@@ -212,4 +212,34 @@ jQuery(document).ready(function($) {
     `;
     
     $('head').append(chartCSS);
+    
+    // Row reply modal
+    var modalHtml = `
+    <div id="otm-reply-modal" style="display:none;position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:100000;">
+      <div style="background:#fff;max-width:600px;margin:10% auto;padding:16px;border-radius:6px;">
+        <h2>Reply</h2>
+        <form id="otm-reply-form" method="post" action="` + ajaxurl.replace('admin-ajax.php','admin-post.php') + `">
+          <input type="hidden" name="action" value="otm_submit_reply" />
+          <input type="hidden" name="parent_id" value="" />
+          <textarea name="text_content" rows="4" style="width:100%"></textarea>
+          <p style="margin-top:10px">
+            <button type="submit" class="button button-primary">Add Reply</button>
+            <button type="button" class="button" id="otm-reply-cancel">Cancel</button>
+          </p>
+        </form>
+      </div>
+    </div>`;
+    $('body').append(modalHtml);
+    
+    $(document).on('click', '.otm-reply-action', function(e){
+        e.preventDefault();
+        var id = $(this).data('id');
+        $('#otm-reply-form [name=parent_id]').val(id);
+        // inject nonce next to form dynamically
+        var nonceField = '<input type="hidden" name="_wpnonce" value="' + (window.otmNonceMap && window.otmNonceMap['otm_submit_reply_'+id] ? window.otmNonceMap['otm_submit_reply_'+id] : '') + '" />';
+        $('#otm-reply-form input[name=_wpnonce]').remove();
+        $('#otm-reply-form').prepend(nonceField);
+        $('#otm-reply-modal').show();
+    });
+    $(document).on('click', '#otm-reply-cancel', function(){ $('#otm-reply-modal').hide(); });
 });

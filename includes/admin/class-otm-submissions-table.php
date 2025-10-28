@@ -47,7 +47,10 @@ class OTM_Submissions_Table extends WP_List_Table {
     protected function column_default( $item, $column_name ) {
         switch ( $column_name ) {
             case 'id':
-                return intval($item->id);
+                $actions = [
+                    'reply' => '<a href="#" class="otm-reply-action" data-id="'.intval($item->id).'">'.__('Reply','otm').'</a>'
+                ];
+                return intval($item->id) . $this->row_actions( $actions );
             case 'task':
                 $title = get_the_title($item->task_id);
                 return $title ? '<a href="'.esc_url(get_edit_post_link($item->task_id)).'">'.esc_html($title).'</a>' : '<em>'.esc_html__('Task deleted','otm').'</em>';
@@ -69,6 +72,7 @@ class OTM_Submissions_Table extends WP_List_Table {
         return [
             'approve' => __('Approve','otm'),
             'reject' => __('Reject','otm'),
+            'set_points' => __('Set Points…','otm'),
         ];
     }
 
@@ -77,8 +81,9 @@ class OTM_Submissions_Table extends WP_List_Table {
         if ( ! current_user_can('otm_moderate_submissions') ) return;
         check_admin_referer('bulk-otm_submissions');
         $action = $this->current_action();
-        if ( ! in_array($action, ['approve','reject'], true) ) return;
+        if ( ! in_array($action, ['approve','reject','set_points'], true) ) return;
         global $wpdb; $table = $wpdb->prefix . 'otm_submissions';
+        $bulk_points = isset($_POST['bulk_points']) ? intval($_POST['bulk_points']) : null;
         foreach ( array_map('absint', $_POST['ids']) as $id ) {
             $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id=%d", $id));
             if ( ! $row ) continue;
@@ -90,6 +95,12 @@ class OTM_Submissions_Table extends WP_List_Table {
                 $wpdb->update($table, [ 'status' => 'rejected', 'approved_at' => null, 'updated_at' => current_time('mysql',1) ], ['id' => $id]);
                 otm_points_service()->set_points_for_submission( (int)$row->user_id, (int)$row->task_id, (int)$id, 0 );
                 do_action('otm_submission_rejected', (int)$row->user_id, ['task_id'=>(int)$row->task_id,'submission_id'=>(int)$id,'status'=>'rejected']);
+            } else if ( $action === 'set_points' && $bulk_points !== null ) {
+                $wpdb->update($table, [ 'awarded_points' => $bulk_points, 'updated_at' => current_time('mysql',1) ], ['id' => $id]);
+                // Only adjust totals immediately if already approved
+                if ( $row->status === 'approved' ) {
+                    otm_points_service()->set_points_for_submission( (int)$row->user_id, (int)$row->task_id, (int)$id, (int)$bulk_points );
+                }
             }
         }
         update_option('otm_cache_buster', time());

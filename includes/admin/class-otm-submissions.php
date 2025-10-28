@@ -244,12 +244,16 @@ class OTM_Submissions {
             echo '</div>';
         }
         
-        // WP_List_Table
+        // WP_List_Table with extra bulk field (set points) and CSV export
         require_once OTM_DIR . 'includes/admin/class-otm-submissions-table.php';
         $list_table = new OTM_Submissions_Table();
         $list_table->prepare_items();
-        echo '<form method="post">';
+        echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'">';
         wp_nonce_field('bulk-otm_submissions');
+        echo '<div class="alignleft actions">';
+        echo '<input type="number" name="bulk_points" placeholder="'.esc_attr__('Points…','otm').'" style="width:120px" min="0" /> ';
+        echo '<button class="button" name="action" value="otm_export_submissions">'.esc_html__('Export CSV','otm').'</button> ';
+        echo '</div>';
         $list_table->display();
         echo '</form>';
         
@@ -257,6 +261,29 @@ class OTM_Submissions {
         // pagination handled by WP_List_Table output
         
         echo '</div>';
+    }
+    
+    // CSV export handler (filtered by query args)
+    public static function handle_export() {
+        if ( ! current_user_can('otm_moderate_submissions') ) wp_die('Insufficient permissions');
+        // No nonce needed for GET export; but we can restrict referrer if needed
+        global $wpdb; $table = $wpdb->prefix . 'otm_submissions';
+        $status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '';
+        $task_id = isset($_GET['task_id']) ? absint($_GET['task_id']) : 0;
+        $where = [];$params=[];
+        if ($task_id) { $where[]='task_id=%d'; $params[]=$task_id; }
+        if ($status && in_array($status, ['submitted','approved','rejected','changes_requested'], true)) { $where[]='status=%s'; $params[]=$status; }
+        $where_sql = $where? ('WHERE '.implode(' AND ',$where)) : '';
+        $sql = "SELECT * FROM $table $where_sql ORDER BY created_at DESC";
+        $rows = $params? $wpdb->get_results($wpdb->prepare($sql,$params), ARRAY_A) : $wpdb->get_results($sql, ARRAY_A);
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="otm-submissions.csv"');
+        $out = fopen('php://output','w');
+        fputcsv($out, ['id','task_id','user_id','parent_id','status','awarded_points','created_at']);
+        foreach ($rows as $r) {
+            fputcsv($out, [ $r['id'],$r['task_id'],$r['user_id'],isset($r['parent_id'])?$r['parent_id']:'',$r['status'],$r['awarded_points'],$r['created_at'] ]);
+        }
+        fclose($out); exit;
     }
     
     public static function handle_score() {

@@ -34,6 +34,7 @@ add_action('plugins_loaded', function() {
     OTM_Submissions::init();
     OTM_Frontend::init();
     add_action('admin_post_otm_submit_reply_front', ['OTM_Frontend','handle_reply_front']);
+    add_action('admin_post_otm_export_submissions', ['OTM_Submissions','handle_export']);
     OTM_Leaderboard::init();
     OTM_Widget_Weekly::register();
     OTM_Widget_Overall::register();
