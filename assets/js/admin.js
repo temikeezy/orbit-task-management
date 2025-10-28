@@ -7,6 +7,29 @@ jQuery(document).ready(function($) {
     if ($('.otm-dashboard-wrap').length) {
         initDashboard();
     }
+    // AJAX moderation for submissions
+    $(document).on('submit', '.otm-action-form', function(e) {
+        var $form = $(this);
+        if (!$form.closest('body').hasClass('wp-admin')) return; // only enhance in admin
+        e.preventDefault();
+        var data = $form.serializeArray();
+        data.push({name: 'action', value: 'otm_update_submission'});
+        var $btn = $form.find('input[type=submit]');
+        $btn.prop('disabled', true);
+        $.post(ajaxurl, $.param(data))
+            .done(function(resp){
+                if (resp && resp.success) {
+                    // update row UI
+                    var $row = $form.closest('tr');
+                    $row.find('.otm-status-badge').text(resp.data.status.charAt(0).toUpperCase() + resp.data.status.slice(1));
+                    $row.find('.otm-points-input').val(resp.data.points);
+                } else if (resp && resp.data && resp.data.message) {
+                    alert(resp.data.message);
+                }
+            })
+            .fail(function(){ alert('Request failed'); })
+            .always(function(){ $btn.prop('disabled', false); });
+    });
     
     function initDashboard() {
         // Add loading states to buttons

@@ -8,6 +8,8 @@ class OTM_Submissions {
         add_action('admin_post_otm_mod_approve', [__CLASS__, 'handle_mod_approve']);
         add_action('admin_post_otm_mod_reject', [__CLASS__, 'handle_mod_reject']);
         add_action('admin_post_otm_mod_request', [__CLASS__, 'handle_mod_request']);
+        // AJAX moderation (admin)
+        add_action('wp_ajax_otm_update_submission', [__CLASS__, 'handle_score_ajax']);
     }
     
     public static function render() {
@@ -427,6 +429,60 @@ class OTM_Submissions {
         update_option('otm_cache_buster', time());
 
         wp_redirect( admin_url('admin.php?page=otm-submissions') ); exit;
+    }
+
+    // AJAX version of handle_score with JSON response
+    public static function handle_score_ajax() {
+        if ( ! current_user_can('otm_moderate_submissions') ) wp_send_json_error(['message' => 'Insufficient permissions'], 403);
+        $id = absint(isset($_POST['submission_id'])?$_POST['submission_id']:0);
+        if ( ! $id ) wp_send_json_error(['message' => 'Invalid submission'], 400);
+        if ( ! isset($_POST['_wpnonce']) || ! wp_verify_nonce($_POST['_wpnonce'], 'otm_score_submission_'.$id) ) {
+            wp_send_json_error(['message' => 'Invalid nonce'], 400);
+        }
+        $points = intval(isset($_POST['points'])?$_POST['points']:0);
+        $status = sanitize_text_field(isset($_POST['status'])?$_POST['status']:'approved');
+
+        global $wpdb; $table = $wpdb->prefix . 'otm_submissions';
+        $row = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id=%d", $id));
+        if ( ! $row ) wp_send_json_error(['message' => 'Submission not found'], 404);
+
+        $approved_at = ($status === 'approved') ? current_time('mysql', 1) : null;
+        $res = $wpdb->update($table, [
+            'awarded_points' => $points,
+            'status' => $status,
+            'moderator_id' => get_current_user_id(),
+            'approved_at' => $approved_at,
+            'updated_at' => current_time('mysql', 1),
+        ], ['id' => $id]);
+
+        if ( $status === 'approved' ) {
+            otm_points_service()->set_points_for_submission( (int)$row->user_id, (int)$row->task_id, (int)$id, (int)$points );
+            if ( function_exists('gamipress_trigger_event') ) {
+                gamipress_trigger_event( 'otm_submission_approved', (int) $row->user_id, [
+                    'task_id' => (int) $row->task_id,
+                    'submission_id' => (int) $id,
+                ] );
+            }
+            do_action( 'otm_submission_approved', (int) $row->user_id, [
+                'task_id' => (int) $row->task_id,
+                'submission_id' => (int) $id,
+                'points' => (int) $points,
+            ] );
+        } else {
+            otm_points_service()->set_points_for_submission( (int)$row->user_id, (int)$row->task_id, (int)$id, 0 );
+            do_action( 'otm_submission_rejected', (int) $row->user_id, [
+                'task_id' => (int) $row->task_id,
+                'submission_id' => (int) $id,
+                'status' => $status,
+            ] );
+        }
+        update_option('otm_cache_buster', time());
+        wp_send_json_success([
+            'id' => $id,
+            'status' => $status,
+            'points' => $points,
+            'updated_at' => current_time('mysql', 1)
+        ]);
     }
     
     private static function update_submission_status_points($id, $status, $points) {
