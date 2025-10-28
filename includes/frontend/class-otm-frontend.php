@@ -109,6 +109,7 @@ class OTM_Frontend {
                 <p><button class="button"><?php echo esc_html__('Send Reply','otm'); ?></button></p>
             </form>
         <?php
+        }
         return ob_get_clean();
     }
     public static function handle_reply_front() {
