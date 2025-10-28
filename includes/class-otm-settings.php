@@ -132,6 +132,8 @@ class OTM_Settings {
         echo '<div class="otm-dashboard-header">';
         echo '<h1 class="otm-dashboard-title">'.esc_html__('OTM Dashboard','otm').'</h1>';
         echo '<p class="otm-dashboard-subtitle">'.esc_html__('Manage tasks, submissions, and track progress','otm').'</p>';
+        // Help tab content inline
+        echo '<div class="notice notice-info"><p>'.esc_html__('Tip: Use [otm_leaderboard] shortcode on pages, and [otm_task_submit] on single task pages to show the submission form. Configure GamiPress integration under Settings → GamiPress.', 'otm').'</p></div>';
         echo '</div>';
         
         // Main stats cards

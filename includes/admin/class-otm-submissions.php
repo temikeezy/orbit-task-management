@@ -177,6 +177,7 @@ class OTM_Submissions {
         // Render the page
         echo '<div class="wrap otm-submissions-wrap">';
         echo '<h1 class="wp-heading-inline">'.esc_html__('Submissions','otm').'</h1>';
+        echo '<div class="notice notice-info"><p>'.esc_html__('Hint: Click a submission ID’s Reply to add a moderator note, use bulk actions for approvals, and Export CSV for reporting.', 'otm').'</p></div>';
         
         // Add new task button
         echo '<a href="'.esc_url(admin_url('post-new.php?post_type=otm_task')).'" class="page-title-action">'.esc_html__('Add New Task','otm').'</a>';
