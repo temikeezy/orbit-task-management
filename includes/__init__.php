@@ -6,6 +6,7 @@ require_once OTM_DIR . 'includes/class-otm-capabilities.php';
 require_once OTM_DIR . 'includes/class-otm-settings.php';
 require_once OTM_DIR . 'includes/class-otm-groups-labels.php';
 require_once OTM_DIR . 'includes/support/class-otm-bb.php';
+require_once OTM_DIR . 'includes/support/class-otm-buddyboss-integration.php';
 
 require_once OTM_DIR . 'includes/cpt/class-otm-task.php';
 require_once OTM_DIR . 'includes/admin/class-otm-submissions.php';

@@ -42,10 +42,50 @@ class OTM_Settings {
         // GamiPress integration
         add_settings_section('otm_gamipress', __('GamiPress', 'otm'), '__return_false', 'otm-settings');
         add_settings_field('otm_gp_integration', __('GamiPress Integration', 'otm'), [__CLASS__, 'field_gamipress'], 'otm-settings', 'otm_gamipress');
+        add_settings_field('otm_gp_automation', __('GamiPress Automation', 'otm'), [__CLASS__, 'field_gamipress_automation'], 'otm-settings', 'otm_gamipress');
     }
     public static function get($key, $default=null) {
         $opts = get_option('otm_settings', []);
         return isset($opts[$key]) ? $opts[$key] : $default;
+    }
+
+    public static function field_gamipress_automation() {
+        $opts = get_option('otm_settings', []);
+        $auto_enabled = isset($opts['gp_auto_enabled']) ? (bool)$opts['gp_auto_enabled'] : false;
+        $event_stream_ids = isset($opts['gp_event_stream_ids']) ? (string)$opts['gp_event_stream_ids'] : '';
+        $rank_entry_id = isset($opts['gp_rank_entry_id']) ? (int)$opts['gp_rank_entry_id'] : 0;
+        $rank_active_id = isset($opts['gp_rank_active_id']) ? (int)$opts['gp_rank_active_id'] : 0;
+        $rank_event_id = isset($opts['gp_rank_event_id']) ? (int)$opts['gp_rank_event_id'] : 0;
+        $rank_stars_id = isset($opts['gp_rank_stars_id']) ? (int)$opts['gp_rank_stars_id'] : 0;
+        $thr_active_points = isset($opts['gp_thr_active_points']) ? (int)$opts['gp_thr_active_points'] : 100;
+        $thr_active_subs = isset($opts['gp_thr_active_subs']) ? (int)$opts['gp_thr_active_subs'] : 3;
+        $ach_first_id = isset($opts['gp_ach_first_id']) ? (int)$opts['gp_ach_first_id'] : 0;
+        $ach_weekly_top_id = isset($opts['gp_ach_weekly_top_id']) ? (int)$opts['gp_ach_weekly_top_id'] : 0;
+        ?>
+        <p><label><input type="checkbox" name="otm_settings[gp_auto_enabled]" value="1" <?php checked($auto_enabled, true); ?> /> <?php esc_html_e('Enable automatic awarding (ranks/achievements) via OTM events', 'otm'); ?></label></p>
+        <p><strong><?php esc_html_e('Event Streams (IDs)', 'otm'); ?></strong><br>
+            <input type="text" name="otm_settings[gp_event_stream_ids]" value="<?php echo esc_attr($event_stream_ids); ?>" class="regular-text" placeholder="e.g. 12,34">
+            <br><span class="description"><?php esc_html_e('Comma-separated BuddyBoss/BuddyPress group IDs that represent the Event Coordination & Community Engagement stream.', 'otm'); ?></span>
+        </p>
+        <p><strong><?php esc_html_e('Rank IDs (optional)', 'otm'); ?></strong><br>
+            <label><?php esc_html_e('Orbit Entry', 'otm'); ?> <input type="number" name="otm_settings[gp_rank_entry_id]" value="<?php echo esc_attr($rank_entry_id); ?>" style="width:120px"></label>
+            <label style="margin-left:10px"><?php esc_html_e('Active Orbit', 'otm'); ?> <input type="number" name="otm_settings[gp_rank_active_id]" value="<?php echo esc_attr($rank_active_id); ?>" style="width:120px"></label>
+            <label style="margin-left:10px"><?php esc_html_e('Event Orbit', 'otm'); ?> <input type="number" name="otm_settings[gp_rank_event_id]" value="<?php echo esc_attr($rank_event_id); ?>" style="width:120px"></label>
+            <label style="margin-left:10px"><?php esc_html_e('Orbit Stars', 'otm'); ?> <input type="number" name="otm_settings[gp_rank_stars_id]" value="<?php echo esc_attr($rank_stars_id); ?>" style="width:120px"></label>
+            <br><span class="description"><?php esc_html_e('Leave blank to skip automatic rank awards or until IDs are created.', 'otm'); ?></span>
+        </p>
+        <p><strong><?php esc_html_e('Thresholds', 'otm'); ?></strong><br>
+            <label><?php esc_html_e('Active Orbit: Min total points', 'otm'); ?> <input type="number" name="otm_settings[gp_thr_active_points]" value="<?php echo esc_attr($thr_active_points); ?>" style="width:120px" min="0"></label>
+            <label style="margin-left:10px"><?php esc_html_e('Active Orbit: Min approved submissions', 'otm'); ?> <input type="number" name="otm_settings[gp_thr_active_subs]" value="<?php echo esc_attr($thr_active_subs); ?>" style="width:120px" min="0"></label>
+        </p>
+        <p><strong><?php esc_html_e('Achievement IDs (optional)', 'otm'); ?></strong><br>
+            <label><?php esc_html_e('First Submission', 'otm'); ?> <input type="number" name="otm_settings[gp_ach_first_id]" value="<?php echo esc_attr($ach_first_id); ?>" style="width:120px"></label>
+            <label style="margin-left:10px"><?php esc_html_e('Weekly Top', 'otm'); ?> <input type="number" name="otm_settings[gp_ach_weekly_top_id]" value="<?php echo esc_attr($ach_weekly_top_id); ?>" style="width:120px"></label>
+        </p>
+        <p>
+            <a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url('admin-post.php?action=otm_gp_recalculate'), 'otm_gp_recalculate' ) ); ?>"><?php esc_html_e('Re-evaluate weekly top & ranks now', 'otm'); ?></a>
+        </p>
+        <?php
     }
     public static function dashboard() {
         global $wpdb;

@@ -400,8 +400,20 @@ class OTM_Submissions {
                     'submission_id' => (int) $id,
                 ] );
             }
+            // Trigger approval hook
+            do_action( 'otm_submission_approved', (int) $row->user_id, [
+                'task_id' => (int) $row->task_id,
+                'submission_id' => (int) $id,
+                'points' => (int) $points,
+            ] );
         } else {
             otm_points_service()->set_points_for_submission( (int)$row->user_id, (int)$row->task_id, (int)$id, 0 );
+            // Trigger rejection hook
+            do_action( 'otm_submission_rejected', (int) $row->user_id, [
+                'task_id' => (int) $row->task_id,
+                'submission_id' => (int) $id,
+                'status' => $status,
+            ] );
         }
         // Invalidate leaderboard cache by bumping cache buster
         update_option('otm_cache_buster', time());

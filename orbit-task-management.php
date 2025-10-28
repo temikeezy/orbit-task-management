@@ -23,6 +23,9 @@ register_activation_hook( __FILE__, ['OTM_Install', 'activate'] );
 register_deactivation_hook( __FILE__, ['OTM_Install', 'deactivate'] );
 
 add_action('plugins_loaded', function() {
+    // Load text domain for translations
+    load_plugin_textdomain('otm', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    
     OTM_Install::maybe_upgrade();
     OTM_Assets::init();
     OTM_Settings::init();
@@ -38,6 +41,10 @@ add_action('plugins_loaded', function() {
     if ( function_exists('bp_register_group_extension') || class_exists('BP_Group_Extension') ) {
         OTM_Group_Extension::init();
         // Group tabs are fully registered inside the group extension bootstrap (bp_include)
+    }
+    // BuddyBoss integration (if available)
+    if ( class_exists('OTM_BuddyBoss_Integration') ) {
+        OTM_BuddyBoss_Integration::init();
     }
 }, 1);
 

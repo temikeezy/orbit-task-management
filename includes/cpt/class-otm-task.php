@@ -35,7 +35,18 @@ class OTM_Task_CPT {
             'show_ui' => true,
             'menu_icon' => 'dashicons-yes-alt',
             'supports' => ['title','editor','author'],
-            'capability_type' => 'post',
+            'capability_type' => 'otm_task',
+            'capabilities' => [
+                'edit_post' => 'otm_manage_tasks',
+                'read_post' => 'read',
+                'delete_post' => 'otm_manage_tasks',
+                'edit_posts' => 'otm_manage_tasks',
+                'edit_others_posts' => 'otm_manage_tasks',
+                'publish_posts' => 'otm_manage_tasks',
+                'read_private_posts' => 'otm_manage_tasks',
+                'create_posts' => 'otm_manage_tasks',
+            ],
+            'map_meta_cap' => true,
             'show_in_rest' => true,
         ]);
     }
