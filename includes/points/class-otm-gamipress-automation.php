@@ -239,5 +239,3 @@ class OTM_Gamipress_Automation {
         return ! empty($found);
     }
 }
-
-

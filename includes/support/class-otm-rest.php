@@ -89,4 +89,5 @@ class OTM_REST {
     }
 }
 
-
+// Initialize REST API
+OTM_REST::init();

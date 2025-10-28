@@ -76,5 +76,3 @@ class OTM_Widget_My_Points extends WP_Widget {
 
     public static function register() { register_widget(__CLASS__); }
 }
-
-

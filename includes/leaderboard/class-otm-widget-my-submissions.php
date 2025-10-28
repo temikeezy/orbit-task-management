@@ -57,5 +57,3 @@ class OTM_Widget_My_Submissions extends WP_Widget {
 
     public static function register() { register_widget(__CLASS__); }
 }
-
-

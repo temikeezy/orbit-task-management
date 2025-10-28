@@ -96,4 +96,5 @@ class OTM_Privacy {
     }
 }
 
-
+// Initialize privacy tools
+OTM_Privacy::init();
