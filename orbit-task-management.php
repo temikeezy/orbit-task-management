@@ -51,6 +51,9 @@ add_action('plugins_loaded', function() {
     if ( class_exists('OTM_Gamipress_Automation') ) {
         OTM_Gamipress_Automation::init();
     }
+    if ( class_exists('OTM_Privacy') ) {
+        OTM_Privacy::init();
+    }
 }, 1);
 
 /** Points service singleton (native or GamiPress-decorated) */
