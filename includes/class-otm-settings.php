@@ -187,6 +187,21 @@ class OTM_Settings {
         
         // Charts and activity section
         echo '<div class="otm-dashboard-content">';
+        // Onboarding cards
+        echo '<div class="otm-dashboard-card">';
+        echo '<div class="otm-card-header">';
+        echo '<h2>'.esc_html__('Get Started','otm').'</h2>';
+        echo '</div>';
+        echo '<div class="otm-card-content">';
+        echo '<ol class="otm-onboarding-list">';
+        echo '<li><strong>'.esc_html__('Create your first Task','otm').'</strong> – <a class="otm-btn otm-btn-link" href="'.esc_url(admin_url('post-new.php?post_type=otm_task')).'">'.esc_html__('Add Task','otm').'</a></li>';
+        echo '<li><strong>'.esc_html__('Configure Streams (Groups)','otm').'</strong> – '.esc_html__('Set the Stream on each task; requires BuddyBoss/BuddyPress.','otm').'</li>';
+        echo '<li><strong>'.esc_html__('Review Submissions','otm').'</strong> – <a class="otm-btn otm-btn-link" href="'.esc_url(admin_url('admin.php?page=otm-submissions')).'">'.esc_html__('Open Submissions','otm').'</a></li>';
+        echo '<li><strong>'.esc_html__('Enable GamiPress (Optional)','otm').'</strong> – <a class="otm-btn otm-btn-link" href="'.esc_url(admin_url('admin.php?page=otm-settings')).'">'.esc_html__('Open Settings','otm').'</a></li>';
+        echo '<li><strong>'.esc_html__('Add Leaderboards to a Page','otm').'</strong> – '.esc_html__('Use the [otm_leaderboard] shortcode; try scope="stream" on group pages.','otm').'</li>';
+        echo '</ol>';
+        echo '</div>';
+        echo '</div>';
         
         // Quick actions card
         echo '<div class="otm-dashboard-card">';
