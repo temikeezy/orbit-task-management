@@ -256,7 +256,7 @@ class OTM_Submissions {
             echo '</th>';
         }
         
-        echo '<th>Actions</th>';
+        echo '<th>Content</th><th>Actions</th>';
         echo '</tr>';
         echo '</thead>';
         echo '<tbody>';
@@ -289,6 +289,28 @@ class OTM_Submissions {
                 echo '<td>'.intval($submission->awarded_points).'</td>';
                 echo '<td>';
                 echo '<time datetime="'.esc_attr($submission->created_at).'">'.esc_html(human_time_diff(strtotime($submission->created_at), current_time('timestamp'))).' '.esc_html__('ago','otm').'</time>';
+                echo '</td>';
+                echo '<td style="max-width:280px;">';
+                $summary_parts = [];
+                if ( ! empty($submission->text_content) ) {
+                    $summary_parts[] = wp_kses_post( wp_trim_words( $submission->text_content, 20, '…' ) );
+                }
+                if ( ! empty($submission->urls_json) ) {
+                    $urls = json_decode($submission->urls_json, true);
+                    if ( is_array($urls) && ! empty($urls) ) {
+                        $first = esc_url($urls[0]);
+                        $summary_parts[] = '<a href="'.esc_url($first).'" target="_blank" rel="noopener">'.esc_html__('Link','otm').'</a>';
+                    }
+                }
+                if ( ! empty($submission->files_json) ) {
+                    $files = json_decode($submission->files_json, true);
+                    if ( is_array($files) && ! empty($files) ) {
+                        $links = [];
+                        foreach ( $files as $f ) { $links[] = '<a href="'.esc_url($f).'" target="_blank" rel="noopener">'.esc_html__('File','otm').'</a>'; }
+                        $summary_parts[] = implode(' , ', $links);
+                    }
+                }
+                echo $summary_parts ? implode(' • ', $summary_parts) : '<em>'.esc_html__('No content','otm').'</em>';
                 echo '</td>';
             echo '<td>';
                 echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'" class="otm-action-form">';

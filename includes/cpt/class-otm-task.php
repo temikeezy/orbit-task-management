@@ -104,7 +104,7 @@ class OTM_Task_CPT {
 
         echo '<table class="widefat fixed striped">';
         echo '<thead><tr>';
-        echo '<th>#</th><th>'.esc_html__('User','otm').'</th><th>'.esc_html__('Status','otm').'</th><th>'.esc_html__('Points','otm').'</th><th>'.esc_html__('Submitted','otm').'</th><th>'.esc_html__('Action','otm').'</th>';
+        echo '<th>#</th><th>'.esc_html__('User','otm').'</th><th>'.esc_html__('Status','otm').'</th><th>'.esc_html__('Points','otm').'</th><th>'.esc_html__('Submitted','otm').'</th><th>'.esc_html__('Content','otm').'</th><th>'.esc_html__('Action','otm').'</th>';
         echo '</tr></thead><tbody>';
         foreach ($rows as $r) {
             $user = get_user_by('id', $r->user_id);
@@ -114,6 +114,28 @@ class OTM_Task_CPT {
             echo '<td>'.esc_html(ucfirst($r->status)).'</td>';
             echo '<td>'.intval($r->awarded_points).'</td>';
             echo '<td><time datetime="'.esc_attr($r->created_at).'">'.esc_html(human_time_diff(strtotime($r->created_at), current_time('timestamp'))).' '.esc_html__('ago','otm').'</time></td>';
+            echo '<td style="max-width:280px;">';
+            $summary_parts = [];
+            if ( ! empty($r->text_content) ) {
+                $summary_parts[] = wp_kses_post( wp_trim_words( $r->text_content, 20, '…' ) );
+            }
+            if ( ! empty($r->urls_json) ) {
+                $urls = json_decode($r->urls_json, true);
+                if ( is_array($urls) && ! empty($urls) ) {
+                    $first = esc_url($urls[0]);
+                    $summary_parts[] = '<a href="'.esc_url($first).'" target="_blank" rel="noopener">'.esc_html__('Link','otm').'</a>';
+                }
+            }
+            if ( ! empty($r->files_json) ) {
+                $files = json_decode($r->files_json, true);
+                if ( is_array($files) && ! empty($files) ) {
+                    $links = [];
+                    foreach ( $files as $f ) { $links[] = '<a href="'.esc_url($f).'" target="_blank" rel="noopener">'.esc_html__('File','otm').'</a>'; }
+                    $summary_parts[] = implode(' , ', $links);
+                }
+            }
+            echo $summary_parts ? implode(' • ', $summary_parts) : '<em>'.esc_html__('No content','otm').'</em>';
+            echo '</td>';
             echo '<td>';
             echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'" class="otm-action-form">';
             echo '<input type="hidden" name="action" value="otm_score_submission" />';
