@@ -164,31 +164,43 @@ class OTM_Task_CPT {
         $before = [];
         $after = [];
         foreach ($cols as $k=>$v) {
-            if ($k === 'author') { $before[$k]=$v; $before['otm_submissions']=__('Submissions','otm'); }
+            if ($k === 'title') { $before[$k]=$v; $before['otm_stream']=__('Stream','otm'); }
+            else if ($k === 'author') { $before[$k]=$v; $before['otm_submissions']=__('Submissions','otm'); }
             else { $before[$k]=$v; }
         }
         return $before;
     }
 
     public static function column_content($column, $post_id) {
-        if ( $column !== 'otm_submissions' ) return;
-        global $wpdb; $table = $wpdb->prefix . 'otm_submissions';
-        $counts = $wpdb->get_row($wpdb->prepare("SELECT 
-            SUM(CASE WHEN status='submitted' THEN 1 ELSE 0 END) submitted,
-            SUM(CASE WHEN status='approved' THEN 1 ELSE 0 END) approved,
-            SUM(CASE WHEN status='rejected' THEN 1 ELSE 0 END) rejected,
-            SUM(CASE WHEN status='changes_requested' THEN 1 ELSE 0 END) requested
-            FROM $table WHERE task_id=%d", $post_id));
-        $link = function($status, $label, $count) use($post_id) {
-            $url = add_query_arg(['page'=>'otm-submissions','task_id'=>$post_id,'status'=>$status], admin_url('admin.php'));
-            return '<a href="'.esc_url($url).'">'.esc_html($label).'</a> '.intval($count);
-        };
-        $parts = [];
-        $parts[] = $link('submitted', __('Pending','otm'), intval($counts->submitted));
-        $parts[] = $link('approved', __('Approved','otm'), intval($counts->approved));
-        $parts[] = $link('rejected', __('Rejected','otm'), intval($counts->rejected));
-        $parts[] = $link('changes_requested', __('Changes','otm'), intval($counts->requested));
-        echo implode(' | ', $parts);
+        if ( $column === 'otm_stream' ) {
+            $gid = (int) get_post_meta($post_id, '_otm_stream_id', true);
+            if ( $gid ) {
+                $name = class_exists('OTM_BB') ? OTM_BB::stream_name($gid) : ('#'.$gid);
+                echo esc_html($name);
+            } else {
+                echo '<em>'.esc_html__('—','otm').'</em>';
+            }
+            return;
+        }
+        if ( $column === 'otm_submissions' ) {
+            global $wpdb; $table = $wpdb->prefix . 'otm_submissions';
+            $counts = $wpdb->get_row($wpdb->prepare("SELECT 
+                SUM(CASE WHEN status='submitted' THEN 1 ELSE 0 END) submitted,
+                SUM(CASE WHEN status='approved' THEN 1 ELSE 0 END) approved,
+                SUM(CASE WHEN status='rejected' THEN 1 ELSE 0 END) rejected,
+                SUM(CASE WHEN status='changes_requested' THEN 1 ELSE 0 END) requested
+                FROM $table WHERE task_id=%d", $post_id));
+            $link = function($status, $label, $count) use($post_id) {
+                $url = add_query_arg(['page'=>'otm-submissions','task_id'=>$post_id,'status'=>$status], admin_url('admin.php'));
+                return '<a href="'.esc_url($url).'">'.esc_html($label).'</a> '.intval($count);
+            };
+            $parts = [];
+            $parts[] = $link('submitted', __('Pending','otm'), intval($counts->submitted));
+            $parts[] = $link('approved', __('Approved','otm'), intval($counts->approved));
+            $parts[] = $link('rejected', __('Rejected','otm'), intval($counts->rejected));
+            $parts[] = $link('changes_requested', __('Changes','otm'), intval($counts->requested));
+            echo implode(' | ', $parts);
+        }
     }
 
     public static function row_actions($actions, $post) {
