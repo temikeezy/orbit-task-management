@@ -84,6 +84,7 @@ class OTM_Settings {
         </p>
         <p>
             <a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url('admin-post.php?action=otm_gp_recalculate'), 'otm_gp_recalculate' ) ); ?>"><?php esc_html_e('Re-evaluate weekly top & ranks now', 'otm'); ?></a>
+            <a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url('admin-post.php?action=otm_gp_create_items'), 'otm_gp_create_items' ) ); ?>"><?php esc_html_e('Create/Update GamiPress items', 'otm'); ?></a>
         </p>
         <?php
     }

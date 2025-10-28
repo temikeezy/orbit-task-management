@@ -13,6 +13,8 @@ class OTM_Gamipress_Automation {
     public static function init() {
         // Admin action to re-evaluate awards
         add_action('admin_post_otm_gp_recalculate', [__CLASS__, 'handle_recalculate']);
+        // Admin action to create/update GP items
+        add_action('admin_post_otm_gp_create_items', [__CLASS__, 'handle_create_items']);
 
         // Runtime automation only if enabled and GamiPress available
         if ( ! self::is_enabled() || ! self::has_gp() ) return;
@@ -95,6 +97,78 @@ class OTM_Gamipress_Automation {
 
         wp_safe_redirect( wp_get_referer() ?: admin_url('admin.php?page=otm-settings') );
         exit;
+    }
+
+    /**
+     * Create/update basic GamiPress items (ranks/achievements) and store IDs in settings.
+     * Does NOT define requirements; awards are handled by OTM events programmatically.
+     */
+    public static function handle_create_items() {
+        if ( ! current_user_can('otm_manage_settings') ) wp_die('Insufficient permissions');
+        check_admin_referer('otm_gp_create_items');
+
+        if ( ! self::has_gp() ) {
+            wp_safe_redirect( wp_get_referer() ?: admin_url('admin.php?page=otm-settings') );
+            exit;
+        }
+
+        $opts = get_option('otm_settings', []);
+
+        // Determine base post types
+        $ach_pt = self::detect_achievement_post_type();
+        $rank_pt = self::detect_rank_post_type();
+
+        // Create ranks if missing
+        $opts['gp_rank_entry_id'] = self::maybe_create_post($rank_pt, 'otm-rank-entry', __('Orbit Entry','otm'), isset($opts['gp_rank_entry_id']) ? (int)$opts['gp_rank_entry_id'] : 0);
+        $opts['gp_rank_active_id'] = self::maybe_create_post($rank_pt, 'otm-rank-active', __('Active Orbit','otm'), isset($opts['gp_rank_active_id']) ? (int)$opts['gp_rank_active_id'] : 0);
+        $opts['gp_rank_event_id']  = self::maybe_create_post($rank_pt, 'otm-rank-event',  __('Event Orbit (Ilorin)','otm'), isset($opts['gp_rank_event_id']) ? (int)$opts['gp_rank_event_id'] : 0);
+        $opts['gp_rank_stars_id']  = self::maybe_create_post($rank_pt, 'otm-rank-stars',  __('Orbit Stars','otm'), isset($opts['gp_rank_stars_id']) ? (int)$opts['gp_rank_stars_id'] : 0);
+
+        // Create achievements if missing
+        $opts['gp_ach_first_id']      = self::maybe_create_post($ach_pt, 'otm-ach-first', __('First Submission','otm'), isset($opts['gp_ach_first_id']) ? (int)$opts['gp_ach_first_id'] : 0);
+        $opts['gp_ach_weekly_top_id'] = self::maybe_create_post($ach_pt, 'otm-ach-weekly-top', __('Weekly Top','otm'), isset($opts['gp_ach_weekly_top_id']) ? (int)$opts['gp_ach_weekly_top_id'] : 0);
+
+        update_option('otm_settings', $opts);
+
+        wp_safe_redirect( wp_get_referer() ?: admin_url('admin.php?page=otm-settings') );
+        exit;
+    }
+
+    private static function detect_achievement_post_type() {
+        if ( function_exists('gamipress_get_achievement_types') ) {
+            $types = gamipress_get_achievement_types();
+            if ( is_array($types) && ! empty($types) ) {
+                $first = reset($types);
+                if ( isset($first['post_type']) ) return $first['post_type'];
+            }
+        }
+        // Fallback commonly used type
+        return 'badge';
+    }
+
+    private static function detect_rank_post_type() {
+        if ( function_exists('gamipress_get_rank_types') ) {
+            $types = gamipress_get_rank_types();
+            if ( is_array($types) && ! empty($types) ) {
+                $first = reset($types);
+                if ( isset($first['post_type']) ) return $first['post_type'];
+            }
+        }
+        // Fallback
+        return 'rank';
+    }
+
+    private static function maybe_create_post( $post_type, $slug, $title, $existing_id = 0 ) {
+        if ( $existing_id && get_post( $existing_id ) ) return (int) $existing_id;
+        $existing = get_page_by_path( $slug, OBJECT, $post_type );
+        if ( $existing ) return (int) $existing->ID;
+        $id = wp_insert_post([
+            'post_type' => $post_type,
+            'post_status' => 'publish',
+            'post_name' => $slug,
+            'post_title' => $title,
+        ]);
+        return (int) $id;
     }
 
     private static function award_weekly_top() {
