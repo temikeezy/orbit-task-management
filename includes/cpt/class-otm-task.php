@@ -38,6 +38,7 @@ class OTM_Task_CPT {
     }
     public static function metaboxes() {
         add_meta_box('otm_task_meta', __('Task Details','otm'), [__CLASS__, 'render_meta'], 'otm_task', 'normal', 'high');
+        add_meta_box('otm_task_submissions', __('Submissions','otm'), [__CLASS__, 'render_submissions_meta'], 'otm_task', 'normal', 'default');
     }
     public static function render_meta($post) {
         $gid = get_post_meta($post->ID, '_otm_stream_id', true);
@@ -85,5 +86,52 @@ class OTM_Task_CPT {
         update_post_meta($post_id, '_otm_deadline', $deadline_val);
         $formats = ['text'=>!empty($_POST['otm_formats']['text']),'url'=>!empty($_POST['otm_formats']['url']),'file'=>!empty($_POST['otm_formats']['file'])];
         update_post_meta($post_id, '_otm_formats', $formats);
+    }
+
+    public static function render_submissions_meta($post) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'otm_submissions';
+        $rows = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE task_id=%d ORDER BY created_at DESC LIMIT 20", $post->ID));
+
+        echo '<div class="otm-task-submissions-metabox">';
+        echo '<p><a class="button" href="'.esc_url( admin_url('admin.php?page=otm-submissions&task_id='.$post->ID) ).'">'.esc_html__('Open full submissions manager','otm').'</a></p>';
+
+        if ( empty($rows) ) {
+            echo '<p>'.esc_html__('No submissions yet.','otm').'</p>';
+            echo '</div>';
+            return;
+        }
+
+        echo '<table class="widefat fixed striped">';
+        echo '<thead><tr>';
+        echo '<th>#</th><th>'.esc_html__('User','otm').'</th><th>'.esc_html__('Status','otm').'</th><th>'.esc_html__('Points','otm').'</th><th>'.esc_html__('Submitted','otm').'</th><th>'.esc_html__('Action','otm').'</th>';
+        echo '</tr></thead><tbody>';
+        foreach ($rows as $r) {
+            $user = get_user_by('id', $r->user_id);
+            echo '<tr>';
+            echo '<td>'.intval($r->id).'</td>';
+            echo '<td>'.esc_html($user ? $user->display_name : ('#'.$r->user_id)).'</td>';
+            echo '<td>'.esc_html(ucfirst($r->status)).'</td>';
+            echo '<td>'.intval($r->awarded_points).'</td>';
+            echo '<td><time datetime="'.esc_attr($r->created_at).'">'.esc_html(human_time_diff(strtotime($r->created_at), current_time('timestamp'))).' '.esc_html__('ago','otm').'</time></td>';
+            echo '<td>';
+            echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'" class="otm-action-form">';
+            echo '<input type="hidden" name="action" value="otm_score_submission" />';
+            wp_nonce_field('otm_score_submission_'.$r->id);
+            echo '<input type="hidden" name="submission_id" value="'.intval($r->id).'" />';
+            echo '<input type="number" name="points" value="'.intval($r->awarded_points).'" min="0" max="1000" style="width:90px;margin-right:6px" />';
+            echo '<select name="status" style="margin-right:6px">';
+            echo '<option value="submitted" '.selected($r->status, 'submitted', false).'>'.esc_html__('Pending','otm').'</option>';
+            echo '<option value="approved" '.selected($r->status, 'approved', false).'>'.esc_html__('Approve','otm').'</option>';
+            echo '<option value="rejected" '.selected($r->status, 'rejected', false).'>'.esc_html__('Reject','otm').'</option>';
+            echo '<option value="changes_requested" '.selected($r->status, 'changes_requested', false).'>'.esc_html__('Request Changes','otm').'</option>';
+            echo '</select>';
+            echo '<input type="submit" class="button button-small button-primary" value="'.esc_attr__('Update','otm').'" />';
+            echo '</form>';
+            echo '</td>';
+            echo '</tr>';
+        }
+        echo '</tbody></table>';
+        echo '</div>';
     }
 }
