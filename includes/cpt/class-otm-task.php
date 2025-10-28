@@ -36,20 +36,11 @@ class OTM_Task_CPT {
             'menu_icon' => 'dashicons-yes-alt',
             'supports' => ['title','editor','author'],
             'capability_type' => 'post',
-            'capabilities' => [
-                'edit_post' => 'edit_posts',
-                'read_post' => 'read',
-                'delete_post' => 'delete_posts',
-                'edit_posts' => 'edit_posts',
-                'edit_others_posts' => 'edit_others_posts',
-                'publish_posts' => 'publish_posts',
-                'read_private_posts' => 'read_private_posts',
-                'create_posts' => 'edit_posts',
-            ],
             'map_meta_cap' => true,
             'show_in_rest' => true,
         ]);
     }
+    
     public static function metaboxes() {
         add_meta_box('otm_task_meta', __('Task Details','otm'), [__CLASS__, 'render_meta'], 'otm_task', 'normal', 'high');
         add_meta_box('otm_task_submissions', __('Submissions','otm'), [__CLASS__, 'render_submissions_meta'], 'otm_task', 'normal', 'default');
