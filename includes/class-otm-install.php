@@ -2,7 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class OTM_Install {
-    const DB_VERSION = '0.1.0';
+    const DB_VERSION = '0.1.1';
 
     public static function activate() {
         self::create_tables();
@@ -31,6 +31,7 @@ class OTM_Install {
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
             task_id BIGINT UNSIGNED NOT NULL,
             user_id BIGINT UNSIGNED NOT NULL,
+            parent_id BIGINT UNSIGNED NULL,
             text_content LONGTEXT NULL,
             urls_json LONGTEXT NULL,
             files_json LONGTEXT NULL,
@@ -44,6 +45,7 @@ class OTM_Install {
             PRIMARY KEY (id),
             KEY task_id (task_id),
             KEY user_id (user_id),
+            KEY parent_id (parent_id),
             KEY status (status),
             KEY approved_at (approved_at)
         ) $charset;";

@@ -10,8 +10,34 @@ class OTM_Submissions {
         add_action('admin_post_otm_mod_request', [__CLASS__, 'handle_mod_request']);
         // AJAX moderation (admin)
         add_action('wp_ajax_otm_update_submission', [__CLASS__, 'handle_score_ajax']);
+        // Reply handler
+        add_action('admin_post_otm_submit_reply', [__CLASS__, 'handle_submit_reply']);
     }
     
+    // Handle threaded reply submission (admin)
+    public static function handle_submit_reply() {
+        if ( ! current_user_can('otm_moderate_submissions') ) wp_die('Insufficient permissions');
+        $parent_id = absint(isset($_POST['parent_id'])?$_POST['parent_id']:0);
+        check_admin_referer('otm_submit_reply_'.$parent_id);
+        $text = isset($_POST['text_content']) ? wp_kses_post($_POST['text_content']) : '';
+        if ( ! $parent_id || ! $text ) { wp_safe_redirect( wp_get_referer() ?: admin_url('admin.php?page=otm-submissions') ); exit; }
+
+        global $wpdb; $table = $wpdb->prefix . 'otm_submissions';
+        $parent = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id=%d", $parent_id));
+        if ( ! $parent ) { wp_safe_redirect( wp_get_referer() ?: admin_url('admin.php?page=otm-submissions') ); exit; }
+
+        $wpdb->insert($table, [
+            'task_id' => (int)$parent->task_id,
+            'user_id' => get_current_user_id(),
+            'parent_id' => $parent_id,
+            'text_content' => $text,
+            'status' => 'submitted',
+            'awarded_points' => 0,
+            'created_at' => current_time('mysql', 1),
+        ]);
+
+        wp_safe_redirect( wp_get_referer() ?: admin_url('admin.php?page=otm-submissions') ); exit;
+    }
     public static function render() {
         if ( ! current_user_can('otm_moderate_submissions') ) {
             wp_die('Insufficient permissions');
@@ -266,7 +292,14 @@ class OTM_Submissions {
         if (empty($submissions)) {
             echo '<tr><td colspan="7" class="no-items">'.esc_html__('No submissions found.','otm').'</td></tr>';
         } else {
-            foreach ($submissions as $submission) {
+            // Group by parent_id: parent first, then children
+            $by_parent = [];
+            foreach ($submissions as $s) { $pid = $s->parent_id ? (int)$s->parent_id : (int)$s->id; $by_parent[$pid][] = $s; }
+            foreach ($by_parent as $parent_id => $items) {
+                // Ensure parent is first
+                usort($items, function($a,$b){ $aid = $a->parent_id?1:0; $bid=$b->parent_id?1:0; return $aid - $bid ?: strcmp($a->created_at, $b->created_at); });
+                foreach ($items as $submission) {
+                    $is_child = (int)$submission->id !== (int)$parent_id;
             echo '<tr>';
                 echo '<td>'.intval($submission->id).'</td>';
                 echo '<td>';
@@ -286,7 +319,8 @@ class OTM_Submissions {
                 echo '</td>';
                 echo '<td>';
                 $status_class = 'otm-status-' . $submission->status;
-                echo '<span class="otm-status-badge '.$status_class.'">'.esc_html(ucfirst($submission->status)).'</span>';
+                    echo ($is_child? '<span style="opacity:.8;margin-left:12px">↳ </span>' : '');
+                    echo '<span class="otm-status-badge '.$status_class.'">'.esc_html(ucfirst($submission->status)).'</span>';
                 echo '</td>';
                 echo '<td>'.intval($submission->awarded_points).'</td>';
                 echo '<td>';
@@ -338,9 +372,22 @@ class OTM_Submissions {
                 echo '<input type="submit" class="button button-primary button-small" value="'.esc_attr__('Update','otm').'">';
                 echo '</div>';
             echo '</form>';
-            echo '</td>';
-            echo '</tr>';
-        }
+                    echo '</td>';
+                    echo '</tr>';
+                    // Reply row
+                    if ( ! $is_child ) {
+                        echo '<tr class="otm-reply-row"><td colspan="7">';
+                        echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'" class="otm-reply-form">';
+                        echo '<input type="hidden" name="action" value="otm_submit_reply" />';
+                        wp_nonce_field('otm_submit_reply_'.$submission->id);
+                        echo '<input type="hidden" name="parent_id" value="'.intval($submission->id).'" />';
+                        echo '<textarea name="text_content" rows="2" style="width:100%" placeholder="'.esc_attr__('Reply to this submission...','otm').'"></textarea>'; 
+                        echo '<p style="margin-top:6px"><input type="submit" class="button" value="'.esc_attr__('Add Reply','otm').'" /></p>';
+                        echo '</form>';
+                        echo '</td></tr>';
+                    }
+                }
+            }
         }
         
         echo '</tbody>';
