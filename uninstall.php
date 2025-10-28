@@ -1,4 +1,19 @@
 <?php
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) exit;
+
+global $wpdb;
+
+// Drop custom tables (ignore if they don't exist)
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}otm_submissions" );
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}otm_points_log" );
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}otm_points_total" );
+
+// Remove plugin options if present
+delete_option( 'otm_settings' );
+delete_option( 'otm_db_version' );
+delete_option( 'otm_cache_buster' );
+
+<?php
 /**
  * Uninstall routine for ORBIT Task Management
  * 
