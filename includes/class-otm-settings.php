@@ -6,6 +6,20 @@ class OTM_Settings {
         add_action('admin_menu', [__CLASS__, 'menu']);
         add_action('admin_init', [__CLASS__, 'register']);
         add_action('admin_enqueue_scripts', [__CLASS__, 'assets']);
+
+        // Bridge settings to integration filters (so runtime uses admin values)
+        add_filter('otm_gamipress_integration_enabled', function($enabled){
+            $val = OTM_Settings::get('gp_integration_enabled', 1);
+            return (bool) $val;
+        });
+        add_filter('otm_gamipress_sync_enabled', function($enabled){
+            $val = OTM_Settings::get('gp_sync_enabled', 1);
+            return (bool) $val;
+        });
+        add_filter('otm_gamipress_points_type', function($slug){
+            $val = OTM_Settings::get('gp_points_type', 'points');
+            return $val ? $val : 'points';
+        });
     }
     public static function menu() {
         add_menu_page('OTM', 'OTM', 'otm_manage_settings', 'otm-dashboard', [__CLASS__, 'dashboard'], 'dashicons-yes', 56);
@@ -24,6 +38,10 @@ class OTM_Settings {
         add_settings_field('otm_week', __('Week Settings', 'otm'), [__CLASS__, 'field_week'], 'otm-settings', 'otm_general');
         add_settings_field('otm_defaults', __('Task Defaults', 'otm'), [__CLASS__, 'field_defaults'], 'otm-settings', 'otm_general');
         add_settings_field('otm_labels', __('Labels', 'otm'), [__CLASS__, 'field_labels'], 'otm-settings', 'otm_general');
+
+        // GamiPress integration
+        add_settings_section('otm_gamipress', __('GamiPress', 'otm'), '__return_false', 'otm-settings');
+        add_settings_field('otm_gp_integration', __('GamiPress Integration', 'otm'), [__CLASS__, 'field_gamipress'], 'otm-settings', 'otm_gamipress');
     }
     public static function get($key, $default=null) {
         $opts = get_option('otm_settings', []);
@@ -253,5 +271,41 @@ class OTM_Settings {
         <p><label>Default Max Points <input type="number" name="otm_settings[default_max_points]" value="<?php echo esc_attr($default_max); ?>" min="0" style="width:120px"></label></p>
         <p><label><input type="checkbox" name="otm_settings[require_membership]" value="1" <?php checked($require_membership, true); ?> /> Require group membership to submit (BuddyBoss/BuddyPress only)</label></p>
         <?php
+    }
+
+    public static function field_gamipress() {
+        $opts = get_option('otm_settings', []);
+        $integration_enabled = isset($opts['gp_integration_enabled']) ? (bool)$opts['gp_integration_enabled'] : true;
+        $sync_enabled = isset($opts['gp_sync_enabled']) ? (bool)$opts['gp_sync_enabled'] : true;
+        $points_type = isset($opts['gp_points_type']) ? $opts['gp_points_type'] : 'points';
+
+        $has_gp = ( function_exists('gamipress') || class_exists('GamiPress') );
+        $available_types = [];
+        if ( function_exists('gamipress_get_points_types_slugs') ) {
+            $available_types = (array) gamipress_get_points_types_slugs();
+        } elseif ( function_exists('gamipress_get_points_types') ) {
+            $types = (array) gamipress_get_points_types();
+            foreach ($types as $slug => $type) { $available_types[] = $slug; }
+        }
+        ?>
+        <p><label><input type="checkbox" name="otm_settings[gp_integration_enabled]" value="1" <?php checked($integration_enabled, true); ?> /> Enable GamiPress integration (auto-detected if installed)</label></p>
+        <p><label><input type="checkbox" name="otm_settings[gp_sync_enabled]" value="1" <?php checked($sync_enabled, true); ?> /> Mirror OTM points to GamiPress points</label></p>
+        <p>
+            <label>GamiPress Points Type:&nbsp;
+            <?php if ( ! empty($available_types) ) { ?>
+                <select name="otm_settings[gp_points_type]">
+                    <?php foreach ($available_types as $slug) { ?>
+                        <option value="<?php echo esc_attr($slug); ?>" <?php selected($points_type, $slug); ?>><?php echo esc_html($slug); ?></option>
+                    <?php } ?>
+                </select>
+            <?php } else { ?>
+                <input type="text" name="otm_settings[gp_points_type]" value="<?php echo esc_attr($points_type); ?>" placeholder="points">
+            <?php } ?>
+            </label>
+        </p>
+        <?php
+        if ( ! $has_gp ) {
+            echo '<p><em>'.esc_html__('GamiPress is not detected. These settings will take effect if/when it is installed.', 'otm').'</em></p>';
+        }
     }
 }

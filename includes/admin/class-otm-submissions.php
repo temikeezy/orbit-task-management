@@ -265,7 +265,7 @@ class OTM_Submissions {
             echo '<tr><td colspan="7" class="no-items">'.esc_html__('No submissions found.','otm').'</td></tr>';
         } else {
             foreach ($submissions as $submission) {
-                echo '<tr>';
+            echo '<tr>';
                 echo '<td>'.intval($submission->id).'</td>';
                 echo '<td>';
                 if ($submission->task_title) {
@@ -290,9 +290,9 @@ class OTM_Submissions {
                 echo '<td>';
                 echo '<time datetime="'.esc_attr($submission->created_at).'">'.esc_html(human_time_diff(strtotime($submission->created_at), current_time('timestamp'))).' '.esc_html__('ago','otm').'</time>';
                 echo '</td>';
-                echo '<td>';
+            echo '<td>';
                 echo '<form method="post" action="'.esc_url(admin_url('admin-post.php')).'" class="otm-action-form">';
-                echo '<input type="hidden" name="action" value="otm_score_submission" />';
+            echo '<input type="hidden" name="action" value="otm_score_submission" />';
                 wp_nonce_field('otm_score_submission_'.$submission->id);
                 echo '<input type="hidden" name="submission_id" value="'.intval($submission->id).'" />';
                 echo '<div class="otm-action-controls">';
@@ -305,10 +305,10 @@ class OTM_Submissions {
                 echo '</select>';
                 echo '<input type="submit" class="button button-primary button-small" value="'.esc_attr__('Update','otm').'">';
                 echo '</div>';
-                echo '</form>';
-                echo '</td>';
-                echo '</tr>';
-            }
+            echo '</form>';
+            echo '</td>';
+            echo '</tr>';
+        }
         }
         
         echo '</tbody>';
@@ -372,6 +372,12 @@ class OTM_Submissions {
 
         if ( $status === 'approved' ) {
             otm_points_service()->set_points_for_submission( (int)$row->user_id, (int)$row->task_id, (int)$id, (int)$points );
+            if ( function_exists('gamipress_trigger_event') ) {
+                gamipress_trigger_event( 'otm_submission_approved', (int) $row->user_id, [
+                    'task_id' => (int) $row->task_id,
+                    'submission_id' => (int) $id,
+                ] );
+            }
         } else {
             otm_points_service()->set_points_for_submission( (int)$row->user_id, (int)$row->task_id, (int)$id, 0 );
         }

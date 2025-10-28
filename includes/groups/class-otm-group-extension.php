@@ -34,12 +34,12 @@ function otm_register_group_extensions() {
                 
                 if ( $q->have_posts() ) {
                     echo '<ul class="item-list bb-forums-list bb-lists">';
-                    while ( $q->have_posts() ) { $q->the_post();
-                        $tid = get_the_ID();
-                        $max_points = intval(get_post_meta($tid, '_otm_max_points', true));
-                        $deadline = esc_html(get_post_meta($tid, '_otm_deadline', true));
-                        $formats = (array) get_post_meta($tid, '_otm_formats', true);
-                        $allowed = array(); foreach (array('text'=>'Text','url'=>'URL','file'=>'File') as $k=>$label){ if(!empty($formats[$k])) $allowed[]=$label; }
+                while ( $q->have_posts() ) { $q->the_post();
+                    $tid = get_the_ID();
+                    $max_points = intval(get_post_meta($tid, '_otm_max_points', true));
+                    $deadline = esc_html(get_post_meta($tid, '_otm_deadline', true));
+                    $formats = (array) get_post_meta($tid, '_otm_formats', true);
+                    $allowed = array(); foreach (array('text'=>'Text','url'=>'URL','file'=>'File') as $k=>$label){ if(!empty($formats[$k])) $allowed[]=$label; }
                         echo '<li class="bb-card bb-card--list">';
                         echo '<h3 class="entry-title"><a href="'.esc_url(get_permalink($tid)).'">'.esc_html(get_the_title()).'</a></h3>';
                         echo '<div class="bb-meta">';
@@ -47,10 +47,10 @@ function otm_register_group_extensions() {
                         if ($allowed) echo '<span class="otm-badge">'.esc_html__('Allowed:','otm').' '.esc_html(implode(', ',$allowed)).'</span>';
                         if ($deadline) echo '<span class="otm-badge">'.esc_html__('Deadline:','otm').' '.esc_html($deadline).'</span>';
                         echo '<span class="otm-badge">'.esc_html( OTM_BB::get_stream_name( $gid ) ).'</span>';
-                        echo '</div>';
+                    echo '</div>';
                         echo '<div class="action">';
                         echo '<a class="button primary" href="'.esc_url( get_permalink($tid) ).'">'.esc_html__('Open Task','otm').'</a>';
-                        if ( current_user_can('otm_manage_tasks') || current_user_can('otm_moderate_submissions') || current_user_can('manage_options') ) {
+                    if ( current_user_can('otm_manage_tasks') || current_user_can('otm_moderate_submissions') || current_user_can('manage_options') ) {
                             echo ' <a class="button" href="'.esc_url( admin_url('admin.php?page=otm-submissions&task_id='.$tid) ).'">'.esc_html__('View Submissions (admin)','otm').'</a>';
                             echo ' <a class="button" href="'.esc_url( admin_url('post.php?action=edit&post='.$tid) ).'">'.esc_html__('Edit Task','otm').'</a>';
                         }

@@ -41,11 +41,23 @@ add_action('plugins_loaded', function() {
     }
 }, 1);
 
-/** Points service singleton (native) */
+/** Points service singleton (native or GamiPress-decorated) */
 function otm_points_service() {
     static $service = null;
     if ( $service ) return $service;
+
     require_once OTM_DIR . 'includes/points/class-otm-points-native.php';
-    $service = new OTM_Points_Native();
+    $native = new OTM_Points_Native();
+
+    if (
+        apply_filters( 'otm_gamipress_integration_enabled', true )
+        && ( function_exists( 'gamipress' ) || class_exists( 'GamiPress' ) || function_exists( 'gamipress_award_points_to_user' ) )
+    ) {
+        require_once OTM_DIR . 'includes/points/class-otm-points-gamipress.php';
+        $service = new OTM_Points_GamiPress( $native );
+    } else {
+        $service = $native;
+    }
+
     return $service;
 }
