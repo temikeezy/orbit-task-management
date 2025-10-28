@@ -33,6 +33,7 @@ add_action('plugins_loaded', function() {
     OTM_Task_CPT::init();
     OTM_Submissions::init();
     OTM_Frontend::init();
+    add_action('admin_post_otm_submit_reply_front', ['OTM_Frontend','handle_reply_front']);
     OTM_Leaderboard::init();
     OTM_Widget_Weekly::register();
     OTM_Widget_Overall::register();

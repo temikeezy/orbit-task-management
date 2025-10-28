@@ -80,7 +80,58 @@ class OTM_Frontend {
             <p><button class="button button-primary">Submit Task</button></p>
         </form>
         <?php
+        // Show existing thread (parent and children) to the user
+        global $wpdb; $table = $wpdb->prefix . 'otm_submissions';
+        $subs = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE task_id=%d AND (user_id=%d OR parent_id IN (SELECT id FROM $table WHERE user_id=%d AND task_id=%d)) ORDER BY created_at ASC", $task_id, get_current_user_id(), get_current_user_id(), $task_id));
+        if ( $subs ) {
+            echo '<div class="otm-thread">';
+            foreach ($subs as $s) {
+                $is_child = ! empty($s->parent_id);
+                $author = get_user_by('id', $s->user_id);
+                echo '<div class="otm-thread-item" style="margin-left:'.($is_child?20:0).'px">';
+                echo '<div class="otm-thread-meta"><strong>'.esc_html($author ? $author->display_name : ('#'.$s->user_id)).'</strong> • <time datetime="'.esc_attr($s->created_at).'">'.esc_html(human_time_diff(strtotime($s->created_at), current_time('timestamp'))).' '.__('ago','otm').'</time></div>';
+                if ( ! empty($s->text_content) ) echo '<div class="otm-thread-text">'.wp_kses_post(wpautop($s->text_content)).'</div>';
+                if ( ! empty($s->urls_json) ) { $urls = json_decode($s->urls_json,true); if (is_array($urls)) { foreach($urls as $u){ echo '<div><a href="'.esc_url($u).'" target="_blank" rel="noopener">'.esc_html($u).'</a></div>'; } } }
+                if ( ! empty($s->files_json) ) { $files = json_decode($s->files_json,true); if (is_array($files)) { foreach($files as $f){ $url = is_numeric($f)? wp_get_attachment_url((int)$f) : $f; if($url) echo '<div><a href="'.esc_url($url).'" target="_blank" rel="noopener">'.esc_html__('File','otm').'</a></div>'; } } }
+                echo '</div>';
+            }
+            echo '</div>';
+        }
+        // Reply form (if parent exists)
+        $parent = $wpdb->get_var($wpdb->prepare("SELECT id FROM $table WHERE task_id=%d AND user_id=%d ORDER BY id ASC LIMIT 1", $task_id, get_current_user_id()));
+        if ( $parent ) {
+            ?>
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="otm-form">
+                <input type="hidden" name="action" value="otm_submit_reply_front">
+                <?php wp_nonce_field('otm_submit_reply_front_'.$parent); ?>
+                <input type="hidden" name="parent_id" value="<?php echo esc_attr($parent); ?>">
+                <p><label><?php echo esc_html__('Reply','otm'); ?></label><textarea name="text_content" rows="3" class="widefat" placeholder="<?php echo esc_attr__('Reply to moderator…','otm'); ?>"></textarea></p>
+                <p><button class="button"><?php echo esc_html__('Send Reply','otm'); ?></button></p>
+            </form>
+        <?php
         return ob_get_clean();
+    }
+    public static function handle_reply_front() {
+        if ( ! is_user_logged_in() ) wp_die('Please log in');
+        $parent_id = absint(isset($_POST['parent_id'])?$_POST['parent_id']:0);
+        check_admin_referer('otm_submit_reply_front_'.$parent_id);
+        $text = isset($_POST['text_content']) ? wp_kses_post($_POST['text_content']) : '';
+        if ( ! $parent_id || ! $text ) { wp_redirect( wp_get_referer() ?: home_url() ); exit; }
+        global $wpdb; $table = $wpdb->prefix . 'otm_submissions';
+        $parent = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id=%d", $parent_id));
+        if ( ! $parent ) { wp_redirect( wp_get_referer() ?: home_url() ); exit; }
+        // Only allow replying to own thread
+        if ( (int)$parent->user_id !== get_current_user_id() ) { wp_die('Not allowed'); }
+        $wpdb->insert($table, [
+            'task_id' => (int)$parent->task_id,
+            'user_id' => get_current_user_id(),
+            'parent_id' => $parent_id,
+            'text_content' => $text,
+            'status' => 'submitted',
+            'awarded_points' => 0,
+            'created_at' => current_time('mysql', 1),
+        ]);
+        wp_redirect( wp_get_referer() ?: get_permalink($parent->task_id) ); exit;
     }
     public static function handle_submit() {
         if ( ! is_user_logged_in() ) wp_die('Please log in');
