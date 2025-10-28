@@ -186,6 +186,12 @@ class OTM_Frontend {
         if ( is_singular('otm_task') ) {
             wp_enqueue_style('otm-frontend');
             wp_enqueue_script('otm-frontend');
+            // 1) Theme override: /otm/single-otm_task.php
+            $theme_path = trailingslashit( get_stylesheet_directory() ) . 'otm/single-otm_task.php';
+            if ( file_exists( $theme_path ) ) {
+                return $theme_path;
+            }
+            // 2) Plugin template fallback
             $plugin_template = OTM_DIR . 'includes/frontend/templates/single-otm_task.php';
             if ( file_exists( $plugin_template ) ) {
                 return $plugin_template;
