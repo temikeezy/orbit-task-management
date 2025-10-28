@@ -306,7 +306,15 @@ class OTM_Submissions {
                     $files = json_decode($submission->files_json, true);
                     if ( is_array($files) && ! empty($files) ) {
                         $links = [];
-                        foreach ( $files as $f ) { $links[] = '<a href="'.esc_url($f).'" target="_blank" rel="noopener">'.esc_html__('File','otm').'</a>'; }
+                        foreach ( $files as $f ) {
+                            // Support both attachment IDs and URLs
+                            if ( is_numeric($f) ) {
+                                $url = wp_get_attachment_url( (int) $f );
+                                if ( $url ) $links[] = '<a href="'.esc_url($url).'" target="_blank" rel="noopener">'.esc_html__('File','otm').'</a>';
+                            } else {
+                                $links[] = '<a href="'.esc_url($f).'" target="_blank" rel="noopener">'.esc_html__('File','otm').'</a>';
+                            }
+                        }
                         $summary_parts[] = implode(' , ', $links);
                     }
                 }

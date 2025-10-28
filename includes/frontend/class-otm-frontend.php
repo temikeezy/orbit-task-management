@@ -74,7 +74,8 @@ class OTM_Frontend {
                 <p><label>URL</label><input type="url" name="url" class="widefat" placeholder="https://"></p>
             <?php endif; ?>
             <?php if (!empty($formats['file'])): ?>
-                <p><label>File</label><input type="file" name="file"></p>
+                <p><label>File(s)</label><input type="file" name="files[]" multiple></p>
+                <small><?php echo esc_html__('Allowed types: images, pdf, docx, txt. Max 10MB each.','otm'); ?></small>
             <?php endif; ?>
             <p><button class="button button-primary">Submit Task</button></p>
         </form>
@@ -108,10 +109,51 @@ class OTM_Frontend {
         $text = isset($_POST['text_content']) ? wp_kses_post($_POST['text_content']) : null;
         $url = isset($_POST['url']) ? esc_url_raw($_POST['url']) : null;
         $files_json = null;
-        if ( ! empty($_FILES['file']['name']) ) {
+        $attachment_ids = [];
+        if ( ! empty($_FILES['files']['name']) && is_array($_FILES['files']['name']) ) {
             require_once ABSPATH . 'wp-admin/includes/file.php';
-            $up = wp_handle_upload($_FILES['file'], ['test_form' => false]);
-            if ( empty($up['error']) ) { $files_json = wp_json_encode([$up['url']]); }
+            require_once ABSPATH . 'wp-admin/includes/image.php';
+            $allowed_mimes = [
+                'jpg|jpeg|jpe' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                'pdf' => 'application/pdf',
+                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'txt' => 'text/plain',
+            ];
+            $files = $_FILES['files'];
+            $count = count($files['name']);
+            for ($i = 0; $i < $count; $i++) {
+                if ( empty($files['name'][$i]) ) continue;
+                $file = [
+                    'name' => $files['name'][$i],
+                    'type' => $files['type'][$i],
+                    'tmp_name' => $files['tmp_name'][$i],
+                    'error' => $files['error'][$i],
+                    'size' => $files['size'][$i],
+                ];
+                // Size limit 10MB
+                if ( $file['size'] > 10 * 1024 * 1024 ) continue;
+                // Upload with mime restrictions
+                $up = wp_handle_upload( $file, [ 'test_form' => false, 'mimes' => $allowed_mimes ] );
+                if ( ! empty($up['error']) ) continue;
+                // Create attachment
+                $attachment = [
+                    'post_mime_type' => $up['type'],
+                    'post_title' => sanitize_file_name( basename($up['file']) ),
+                    'post_content' => '',
+                    'post_status' => 'inherit'
+                ];
+                $attach_id = wp_insert_attachment( $attachment, $up['file'] );
+                if ( is_wp_error($attach_id) ) continue;
+                // Generate metadata if image
+                $attach_data = wp_generate_attachment_metadata( $attach_id, $up['file'] );
+                if ( $attach_data ) wp_update_attachment_metadata( $attach_id, $attach_data );
+                $attachment_ids[] = (int) $attach_id;
+            }
+            if ( $attachment_ids ) {
+                $files_json = wp_json_encode( $attachment_ids );
+            }
         }
         $wpdb->insert($table, [
             'task_id' => $task_id,
