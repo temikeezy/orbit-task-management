@@ -49,9 +49,10 @@ class OTM_Widget_Group_Leaderboard extends WP_Widget {
             $pos = 1;
             foreach ($rows as $r) {
                 $user = get_user_by('id', $r['user_id']);
+                $avatar = get_avatar( $r['user_id'], 24 );
                 echo '<tr>';
                 echo '<td>' . intval($pos++) . '</td>';
-                echo '<td>' . esc_html($user ? $user->display_name : ('#' . $r['user_id'])) . '</td>';
+                echo '<td>' . $avatar . ' ' . esc_html($user ? $user->display_name : ('#' . $r['user_id'])) . '</td>';
                 echo '<td>' . intval($r['week_points']) . '</td>';
                 echo '</tr>';
             }
