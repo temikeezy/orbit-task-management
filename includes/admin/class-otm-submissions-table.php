@@ -135,5 +135,3 @@ class OTM_Submissions_Table extends WP_List_Table {
         ]);
     }
 }
-
-

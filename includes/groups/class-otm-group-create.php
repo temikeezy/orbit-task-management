@@ -59,5 +59,3 @@ if ( class_exists('BP_Group_Extension') && ! class_exists('OTM_Group_Create_Tab'
         }
     }
 }
-
-
