@@ -9,8 +9,23 @@ class OTM_Task_CPT {
     }
     public static function register() {
         register_post_type('otm_task', [
-            'label' => 'OTM Tasks',
-            'labels' => ['name'=>'OTM Tasks','singular_name'=>'OTM Task'],
+            'label' => __('OTM Tasks','otm'),
+            'labels' => [
+                'name' => __('OTM Tasks','otm'),
+                'singular_name' => __('OTM Task','otm'),
+                'menu_name' => __('OTM Tasks','otm'),
+                'name_admin_bar' => __('Task','otm'),
+                'add_new' => __('Add Task','otm'),
+                'add_new_item' => __('Add New Task','otm'),
+                'new_item' => __('New Task','otm'),
+                'edit_item' => __('Edit Task','otm'),
+                'view_item' => __('View Task','otm'),
+                'all_items' => __('All Tasks','otm'),
+                'search_items' => __('Search Tasks','otm'),
+                'parent_item_colon' => __('Parent Tasks:','otm'),
+                'not_found' => __('No tasks found.','otm'),
+                'not_found_in_trash' => __('No tasks found in Trash.','otm'),
+            ],
             'public' => true,
             'has_archive' => 'tasks',
             'rewrite' => [ 'slug' => 'tasks', 'with_front' => false ],
