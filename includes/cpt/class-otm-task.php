@@ -6,6 +6,9 @@ class OTM_Task_CPT {
         add_action('init', [__CLASS__, 'register']);
         add_action('add_meta_boxes', [__CLASS__, 'metaboxes']);
         add_action('save_post_otm_task', [__CLASS__, 'save'], 10, 2);
+        add_filter('manage_otm_task_posts_columns', [__CLASS__, 'columns']);
+        add_action('manage_otm_task_posts_custom_column', [__CLASS__, 'column_content'], 10, 2);
+        add_filter('post_row_actions', [__CLASS__, 'row_actions'], 10, 2);
     }
     public static function register() {
         register_post_type('otm_task', [
@@ -155,5 +158,43 @@ class OTM_Task_CPT {
         }
         echo '</tbody></table>';
         echo '</div>';
+    }
+
+    public static function columns($cols) {
+        $before = [];
+        $after = [];
+        foreach ($cols as $k=>$v) {
+            if ($k === 'author') { $before[$k]=$v; $before['otm_submissions']=__('Submissions','otm'); }
+            else { $before[$k]=$v; }
+        }
+        return $before;
+    }
+
+    public static function column_content($column, $post_id) {
+        if ( $column !== 'otm_submissions' ) return;
+        global $wpdb; $table = $wpdb->prefix . 'otm_submissions';
+        $counts = $wpdb->get_row($wpdb->prepare("SELECT 
+            SUM(CASE WHEN status='submitted' THEN 1 ELSE 0 END) submitted,
+            SUM(CASE WHEN status='approved' THEN 1 ELSE 0 END) approved,
+            SUM(CASE WHEN status='rejected' THEN 1 ELSE 0 END) rejected,
+            SUM(CASE WHEN status='changes_requested' THEN 1 ELSE 0 END) requested
+            FROM $table WHERE task_id=%d", $post_id));
+        $link = function($status, $label, $count) use($post_id) {
+            $url = add_query_arg(['page'=>'otm-submissions','task_id'=>$post_id,'status'=>$status], admin_url('admin.php'));
+            return '<a href="'.esc_url($url).'">'.esc_html($label).'</a> '.intval($count);
+        };
+        $parts = [];
+        $parts[] = $link('submitted', __('Pending','otm'), intval($counts->submitted));
+        $parts[] = $link('approved', __('Approved','otm'), intval($counts->approved));
+        $parts[] = $link('rejected', __('Rejected','otm'), intval($counts->rejected));
+        $parts[] = $link('changes_requested', __('Changes','otm'), intval($counts->requested));
+        echo implode(' | ', $parts);
+    }
+
+    public static function row_actions($actions, $post) {
+        if ( $post->post_type !== 'otm_task' ) return $actions;
+        $url = add_query_arg(['page'=>'otm-submissions','task_id'=>$post->ID], admin_url('admin.php'));
+        $actions['otm_submissions'] = '<a href="'.esc_url($url).'">'.esc_html__('View Submissions','otm').'</a>';
+        return $actions;
     }
 }
