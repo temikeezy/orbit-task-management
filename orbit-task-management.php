@@ -38,6 +38,8 @@ add_action('plugins_loaded', function() {
     OTM_Leaderboard::init();
     OTM_Widget_Weekly::register();
     OTM_Widget_Overall::register();
+    if ( class_exists('OTM_Widget_My_Points') ) OTM_Widget_My_Points::register();
+    if ( class_exists('OTM_Widget_My_Submissions') ) OTM_Widget_My_Submissions::register();
     OTM_Groups_Labels::init();
     // BuddyBoss/BuddyPress group tabs (if available)
     if ( function_exists('bp_register_group_extension') || class_exists('BP_Group_Extension') ) {

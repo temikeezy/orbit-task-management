@@ -16,6 +16,8 @@ require_once OTM_DIR . 'includes/admin/class-otm-submissions.php';
 require_once OTM_DIR . 'includes/leaderboard/class-otm-leaderboard.php';
 require_once OTM_DIR . 'includes/leaderboard/class-otm-widget-weekly.php';
 require_once OTM_DIR . 'includes/leaderboard/class-otm-widget-overall.php';
+require_once OTM_DIR . 'includes/leaderboard/class-otm-widget-my-points.php';
+require_once OTM_DIR . 'includes/leaderboard/class-otm-widget-my-submissions.php';
 
 require_once OTM_DIR . 'includes/points/class-otm-points-service.php';
 require_once OTM_DIR . 'includes/points/class-otm-points-native.php';
