@@ -195,8 +195,12 @@ class OTM_Gamipress_Automation {
 
         $rank_active = (int) self::get_opt('gp_rank_active_id', 0);
         $rank_event = (int) self::get_opt('gp_rank_event_id', 0);
-        $event_ids_raw = (string) self::get_opt('gp_event_stream_ids', '');
-        $event_ids = array_filter(array_map('intval', array_map('trim', explode(',', $event_ids_raw))));
+        $event_ids_raw = self::get_opt('gp_event_stream_ids', '');
+        if ( is_array($event_ids_raw) ) { $event_ids = array_filter(array_map('intval', $event_ids_raw)); }
+        else { $event_ids = array_filter(array_map('intval', array_map('trim', explode(',', (string) $event_ids_raw)))); }
+        $event_ids_raw = self::get_opt('gp_event_stream_ids', '');
+        if ( is_array($event_ids_raw) ) { $event_ids = array_filter(array_map('intval', $event_ids_raw)); }
+        else { $event_ids = array_filter(array_map('intval', array_map('trim', explode(',', (string) $event_ids_raw)))); }
         $min_points = (int) self::get_opt('gp_thr_active_points', 100);
         $min_subs = (int) self::get_opt('gp_thr_active_subs', 3);
 

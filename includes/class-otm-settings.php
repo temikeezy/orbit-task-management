@@ -63,9 +63,21 @@ class OTM_Settings {
         $ach_weekly_top_id = isset($opts['gp_ach_weekly_top_id']) ? (int)$opts['gp_ach_weekly_top_id'] : 0;
         ?>
         <p><label><input type="checkbox" name="otm_settings[gp_auto_enabled]" value="1" <?php checked($auto_enabled, true); ?> /> <?php esc_html_e('Enable automatic awarding (ranks/achievements) via OTM events', 'otm'); ?></label></p>
-        <p><strong><?php esc_html_e('Event Streams (IDs)', 'otm'); ?></strong><br>
-            <input type="text" name="otm_settings[gp_event_stream_ids]" value="<?php echo esc_attr($event_stream_ids); ?>" class="regular-text" placeholder="e.g. 12,34">
-            <br><span class="description"><?php esc_html_e('Comma-separated BuddyBoss/BuddyPress group IDs that represent the Event Coordination & Community Engagement stream.', 'otm'); ?></span>
+        <p><strong><?php esc_html_e('Event Streams', 'otm'); ?></strong><br>
+            <?php if ( class_exists('OTM_BB') && OTM_BB::is_active() ) {
+                $selected = array_filter(array_map('intval', array_map('trim', explode(',', $event_stream_ids))));
+                $groups = OTM_BB::groups_for_dropdown(); ?>
+                <select name="otm_settings[gp_event_stream_ids][]" multiple size="6" style="min-width:260px">
+                    <?php foreach ($groups as $gid => $gname) { ?>
+                        <option value="<?php echo esc_attr($gid); ?>" <?php echo in_array((int)$gid, $selected, true) ? 'selected' : ''; ?>><?php echo esc_html($gname); ?></option>
+                    <?php } ?>
+                </select>
+                <br><span class="description"><?php esc_html_e('Hold Cmd/Ctrl to select multiple streams. Saved as IDs.', 'otm'); ?></span>
+                <?php
+            } else { ?>
+                <input type="text" name="otm_settings[gp_event_stream_ids]" value="<?php echo esc_attr($event_stream_ids); ?>" class="regular-text" placeholder="e.g. 12,34">
+                <br><span class="description"><?php esc_html_e('Comma-separated group IDs that represent Event Coordination & Community Engagement streams.', 'otm'); ?></span>
+            <?php } ?>
         </p>
         <p><strong><?php esc_html_e('Rank IDs (optional)', 'otm'); ?></strong><br>
             <label><?php esc_html_e('Orbit Entry', 'otm'); ?> <input type="number" name="otm_settings[gp_rank_entry_id]" value="<?php echo esc_attr($rank_entry_id); ?>" style="width:120px"></label>
