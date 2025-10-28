@@ -99,7 +99,6 @@ class OTM_Task_CPT {
         $rows = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE task_id=%d ORDER BY created_at DESC LIMIT 20", $post->ID));
 
         echo '<div class="otm-task-submissions-metabox">';
-        echo '<p><a class="button" href="'.esc_url( admin_url('admin.php?page=otm-submissions&task_id='.$post->ID) ).'">'.esc_html__('Open full submissions manager','otm').'</a></p>';
 
         if ( empty($rows) ) {
             echo '<p>'.esc_html__('No submissions yet.','otm').'</p>';
