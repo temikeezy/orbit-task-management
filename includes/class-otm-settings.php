@@ -33,7 +33,7 @@ class OTM_Settings {
         }
     }
     public static function register() {
-        register_setting('otm_settings_group', 'otm_settings');
+        register_setting('otm_settings_group', 'otm_settings', [ 'sanitize_callback' => [ __CLASS__, 'sanitize' ] ]);
         add_settings_section('otm_general', __('General', 'otm'), '__return_false', 'otm-settings');
         add_settings_field('otm_week', __('Week Settings', 'otm'), [__CLASS__, 'field_week'], 'otm-settings', 'otm_general');
         add_settings_field('otm_defaults', __('Task Defaults', 'otm'), [__CLASS__, 'field_defaults'], 'otm-settings', 'otm_general');
@@ -43,6 +43,58 @@ class OTM_Settings {
         add_settings_section('otm_gamipress', __('GamiPress', 'otm'), '__return_false', 'otm-settings');
         add_settings_field('otm_gp_integration', __('GamiPress Integration', 'otm'), [__CLASS__, 'field_gamipress'], 'otm-settings', 'otm_gamipress');
         add_settings_field('otm_gp_automation', __('GamiPress Automation', 'otm'), [__CLASS__, 'field_gamipress_automation'], 'otm-settings', 'otm_gamipress');
+    }
+    public static function sanitize( $input ) {
+        $out = [];
+        // Booleans (checkboxes)
+        foreach ( [
+            'gp_integration_enabled', 'gp_sync_enabled', 'gp_auto_enabled',
+            'rename_groups', 'require_membership'
+        ] as $key ) {
+            $out[$key] = empty( $input[$key] ) ? 0 : 1;
+        }
+
+        // Week start
+        if ( isset($input['week_starts']) && in_array( $input['week_starts'], ['sunday','monday'], true ) ) {
+            $out['week_starts'] = $input['week_starts'];
+        }
+
+        // Defaults & labels
+        if ( isset($input['default_max_points']) ) $out['default_max_points'] = max(0, intval($input['default_max_points']) );
+        if ( isset($input['stream_singular']) ) $out['stream_singular'] = sanitize_text_field( $input['stream_singular'] );
+        if ( isset($input['stream_plural']) ) $out['stream_plural'] = sanitize_text_field( $input['stream_plural'] );
+
+        // GamiPress: points type
+        if ( isset($input['gp_points_type']) ) $out['gp_points_type'] = sanitize_text_field( $input['gp_points_type'] );
+
+        // GamiPress Automation: event streams stored as CSV of IDs for compatibility
+        if ( isset($input['gp_event_stream_ids']) ) {
+            if ( is_array($input['gp_event_stream_ids']) ) {
+                $ids = array_filter( array_map('intval', $input['gp_event_stream_ids'] ) );
+                $out['gp_event_stream_ids'] = implode( ',', $ids );
+            } else {
+                // allow comma-separated manual entry
+                $csv = preg_replace('/[^0-9,]/', '', (string) $input['gp_event_stream_ids']);
+                // normalize spacing
+                $out['gp_event_stream_ids'] = implode(',', array_filter(array_map('intval', array_map('trim', explode(',', $csv)))));
+            }
+        }
+
+        // Rank IDs
+        foreach ( ['gp_rank_entry_id','gp_rank_active_id','gp_rank_event_id','gp_rank_stars_id'] as $k ) {
+            if ( isset($input[$k]) ) $out[$k] = max(0, intval($input[$k]) );
+        }
+
+        // Thresholds
+        if ( isset($input['gp_thr_active_points']) ) $out['gp_thr_active_points'] = max(0, intval($input['gp_thr_active_points']) );
+        if ( isset($input['gp_thr_active_subs']) ) $out['gp_thr_active_subs'] = max(0, intval($input['gp_thr_active_subs']) );
+
+        // Achievement IDs
+        foreach ( ['gp_ach_first_id','gp_ach_weekly_top_id'] as $k ) {
+            if ( isset($input[$k]) ) $out[$k] = max(0, intval($input[$k]) );
+        }
+
+        return $out;
     }
     public static function get($key, $default=null) {
         $opts = get_option('otm_settings', []);
