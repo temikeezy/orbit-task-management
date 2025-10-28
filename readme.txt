@@ -1,9 +1,9 @@
 === ORBIT Task Management ===
-Contributors: orbit
+Contributors: ilorininnovationhub
 Requires at least: 5.6
 Tested up to: 6.x
 Requires PHP: 7.0
-Stable tag: 0.1.5
+Stable tag: 0.1.8
 License: GPLv2 or later
 
 Minimal tasks, public submissions thread, moderation, and native points. BuddyBoss/BuddyPress optional. Each task has a pretty permalink under /tasks and displays a public submission thread and an adaptive submission form.
@@ -39,6 +39,11 @@ Note: Submissions occur only on single task pages.
 3. Admin submissions list with approve/reject and points.
 
 == Changelog ==
+= 0.1.8 =
+* Updated plugin author to Ilorin Innovation Hub
+* Fixed GamiPress settings persistence and sanitization
+* Enhanced settings validation and error handling
+
 = 0.1.5 =
 * Make `otm_task` public with archive `/tasks` and slug rewrites.
 * Add template loader and plugin template for single task pages.
@@ -56,5 +61,8 @@ Note: Submissions occur only on single task pages.
 * Initial CPT, settings skeleton, and assets scaffolding.
 
 == Upgrade Notice ==
+= 0.1.8 =
+Plugin author updated to Ilorin Innovation Hub. GamiPress settings now persist correctly.
+
 = 0.1.5 =
 Public tasks now live under `/tasks`. After updating, visit Settings → Permalinks and click Save if you see 404s.

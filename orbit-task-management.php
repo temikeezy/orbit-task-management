@@ -2,8 +2,8 @@
 /**
  * Plugin Name: ORBIT Task Management
  * Description: Minimal tasks, submissions, scoring, and leaderboards (global & per stream) with native points. BuddyBoss/BuddyPress optional.
- * Version: 0.1.5
- * Author: ORBIT
+ * Version: 0.1.8
+ * Author: Ilorin Innovation Hub
  * Requires at least: 5.6
  * Requires PHP: 7.0
  * Text Domain: otm
@@ -11,7 +11,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'OTM_VERSION', '0.1.7' );
+define( 'OTM_VERSION', '0.1.8' );
 define( 'OTM_FILE', __FILE__ );
 define( 'OTM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OTM_URL', plugin_dir_url( __FILE__ ) );
