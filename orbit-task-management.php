@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: ORBIT Task Management
+ * Plugin Name: ORBIT Task Management Test
  * Description: Minimal tasks, submissions, scoring, and leaderboards (global & per stream) with native points. BuddyBoss/BuddyPress optional.
  * Version: 0.1.8
  * Author: Ilorin Innovation Hub
@@ -37,6 +37,8 @@ add_action('plugins_loaded', function() {
     OTM_Widget_Weekly::register();
     OTM_Widget_Overall::register();
     OTM_Groups_Labels::init();
+    OTM_Bulk_Import::init(); // <-- ADDED THIS LINE
+
     // BuddyBoss/BuddyPress group tabs (if available)
     if ( function_exists('bp_register_group_extension') || class_exists('BP_Group_Extension') ) {
         OTM_Group_Extension::init();
