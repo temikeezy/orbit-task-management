@@ -10,6 +10,7 @@ require_once OTM_DIR . 'includes/support/class-otm-buddyboss-integration.php';
 
 require_once OTM_DIR . 'includes/cpt/class-otm-task.php';
 require_once OTM_DIR . 'includes/admin/class-otm-submissions.php';
+require_once OTM_DIR . 'includes/admin/class-otm-bulk-import.php'; // <-- ADDED THIS LINE
 
 require_once OTM_DIR . 'includes/leaderboard/class-otm-leaderboard.php';
 require_once OTM_DIR . 'includes/leaderboard/class-otm-widget-weekly.php';
